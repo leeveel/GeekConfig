@@ -11,7 +11,7 @@ namespace Test
         {
             Console.WriteLine("-----------------start----------------");
             //设置测试服务器/客户端
-            ConfigManager.Singleton.IsServer = false;
+            ConfigManager.Singleton.IsServer = true;
             //可以在程序已启动时候把所有数据表加载到内存
             //也可以需要的时候再加载（未处理线程安全，所以服务器应该在启服时全部加载）
             //GameDataManager.Instance.LoadAll();

@@ -1,3 +1,5 @@
+using System;
+
 public class XBuffer
 {
     private static readonly int intSize = sizeof(int);
@@ -10,14 +12,18 @@ public class XBuffer
     private static readonly int boolSize = sizeof(bool);
 
     #region Write
-
     public static unsafe void WriteInt(int value, byte[] buffer, ref int offset)
     {
         if (offset + intSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += intSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(int*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(value);
+            *(int*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(value);
             offset += intSize;
         }
     }
@@ -25,10 +31,15 @@ public class XBuffer
     public static unsafe void WriteShort(short value, byte[] buffer, ref int offset)
     {
         if (offset + shortSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += shortSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(short*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(value);
+            *(short*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(value);
             offset += shortSize;
         }
     }
@@ -36,10 +47,15 @@ public class XBuffer
     public static unsafe void WriteLong(long value, byte[] buffer, ref int offset)
     {
         if (offset + longSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += longSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(long*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(value);
+            *(long*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(value);
             offset += longSize;
         }
     }
@@ -47,11 +63,26 @@ public class XBuffer
     public static unsafe void WriteFloat(float value, byte[] buffer, ref int offset)
     {
         if (offset + floatSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += floatSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(float*) (ptr + offset) = value;
-            *(int*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(int*) (ptr + offset));
+            //android il2cpp …¡ÕÀ
+#if ENABLE_IL2CPP
+            var data = System.BitConverter.GetBytes(value);
+            fixed (byte* dataPtr = data)
+            {
+                int intVal = *(int*)dataPtr;
+                *(int*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(intVal);
+            }
+#else
+            *(float*)(ptr + offset) = value;
+            *(int*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(int*)(ptr+offset));
+#endif
             offset += floatSize;
         }
     }
@@ -59,11 +90,24 @@ public class XBuffer
     public static unsafe void WriteDouble(double value, byte[] buffer, ref int offset)
     {
         if (offset + doubleSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += doubleSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(double*) (ptr + offset) = value;
-            *(long*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(long*) (ptr + offset));
+            //android il2cpp …¡ÕÀ
+#if ENABLE_IL2CPP            var data = System.BitConverter.GetBytes(value);
+            fixed (byte* dataPtr = data)
+            {
+                long longVal = *(long*)dataPtr;
+                *(long*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(longVal);
+            }       
+#else            *(double*)(ptr + offset) = value;
+            *(long*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(long*)(ptr + offset));
+#endif
             offset += doubleSize;
         }
     }
@@ -71,7 +115,12 @@ public class XBuffer
     public static unsafe void WriteByte(byte value, byte[] buffer, ref int offset)
     {
         if (offset + byteSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += byteSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
             *(ptr + offset) = value;
@@ -79,13 +128,38 @@ public class XBuffer
         }
     }
 
+    public static unsafe void WriteBytes(byte[] value, byte[] buffer, ref int offset)
+    {
+        if (value == null)
+        {
+            WriteShort(0, buffer, ref offset);
+            return;
+        }
+
+        if (offset + value.Length + shortSize > buffer.Length)
+        {
+            offset += value.Length + shortSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
+        WriteShort((short)value.Length, buffer, ref offset);
+        System.Array.Copy(value, 0, buffer, offset, value.Length);
+        offset += value.Length;
+    }
+
     public static unsafe void WriteSByte(sbyte value, byte[] buffer, ref int offset)
     {
         if (offset + sbyteSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += sbyteSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(sbyte*) (ptr + offset) = value;
+            *(sbyte*)(ptr + offset) = value;
             offset += sbyteSize;
         }
     }
@@ -96,10 +170,24 @@ public class XBuffer
             value = "";
         fixed (byte* ptr = buffer)
         {
-            var len = System.Text.Encoding.UTF8.GetBytes(value, 0, value.Length, buffer, offset + shortSize);
+            int len = 0;
+            try
+            {
+                len = System.Text.Encoding.UTF8.GetBytes(value, 0, value.Length, buffer, offset + shortSize);
+            }catch(Exception e)
+            {
+                len = System.Text.Encoding.UTF8.GetBytes(value).Length + shortSize;
+                if (offset + len <= buffer.Length)
+                    throw e;
+            }
+
             if (offset + len + shortSize > buffer.Length)
-                throw new XBufferOutOfIndexException();
-            WriteShort((short) len, buffer, ref offset);
+            {
+                offset += len + shortSize;
+                return;
+                //throw new XBufferOutOfIndexException();
+            }
+            WriteShort((short)len, buffer, ref offset);
             offset += len;
         }
     }
@@ -107,23 +195,27 @@ public class XBuffer
     public static unsafe void WriteBool(bool value, byte[] buffer, ref int offset)
     {
         if (offset + boolSize > buffer.Length)
-            throw new XBufferOutOfIndexException();
+        {
+            offset += boolSize;
+            return;
+            //throw new XBufferOutOfIndexException();
+        }
+
         fixed (byte* ptr = buffer)
         {
-            *(bool*) (ptr + offset) = value;
+            *(bool*)(ptr + offset) = value;
             offset += boolSize;
         }
     }
+#endregion
 
-    #endregion
-
-    #region Read
+#region Read
 
     public static unsafe int ReadInt(byte[] buffer, ref int offset)
     {
         fixed (byte* ptr = buffer)
         {
-            var value = *(int*) (ptr + offset);
+            var value = *(int*)(ptr + offset);
             offset += intSize;
             return System.Net.IPAddress.NetworkToHostOrder(value);
         }
@@ -133,7 +225,7 @@ public class XBuffer
     {
         fixed (byte* ptr = buffer)
         {
-            var value = *(short*) (ptr + offset);
+            var value = *(short*)(ptr + offset);
             offset += shortSize;
             return System.Net.IPAddress.NetworkToHostOrder(value);
         }
@@ -143,7 +235,7 @@ public class XBuffer
     {
         fixed (byte* ptr = buffer)
         {
-            var value = *(long*) (ptr + offset);
+            var value = *(long*)(ptr + offset);
             offset += longSize;
             return System.Net.IPAddress.NetworkToHostOrder(value);
         }
@@ -153,8 +245,13 @@ public class XBuffer
     {
         fixed (byte* ptr = buffer)
         {
-            *(int*) (ptr + offset) = System.Net.IPAddress.NetworkToHostOrder(*(int*) (ptr + offset));
+            *(int*)(ptr + offset) = System.Net.IPAddress.NetworkToHostOrder(*(int*)(ptr + offset));
+            //android ª·il2cpp…¡ÕÀ
+#if ENABLE_IL2CPP
             var value = System.BitConverter.ToSingle(buffer, offset);
+#else
+            var value = *(float*)(ptr + offset);
+#endif
             offset += floatSize;
             return value;
         }
@@ -164,8 +261,13 @@ public class XBuffer
     {
         fixed (byte* ptr = buffer)
         {
-            *(long*) (ptr + offset) = System.Net.IPAddress.NetworkToHostOrder(*(long*) (ptr + offset));
+            *(long*)(ptr + offset) = System.Net.IPAddress.NetworkToHostOrder(*(long*)(ptr + offset));
+            //android ª·il2cpp…¡ÕÀ
+#if ENABLE_IL2CPP
             var value = System.BitConverter.ToDouble(buffer, offset);
+#else
+            var value = *(double*)(ptr + offset);
+#endif
             offset += doubleSize;
             return value;
         }
@@ -181,11 +283,22 @@ public class XBuffer
         }
     }
 
+    public static unsafe byte[] ReadBytes(byte[] buffer, ref int offset)
+    {
+        var len = ReadShort(buffer, ref offset);
+        if (len == 0)
+            return new byte[0];
+        var data = new byte[len];
+        System.Array.Copy(buffer, offset, data, 0, len);
+        offset += len;
+        return data;
+    }
+
     public static unsafe sbyte ReadSByte(byte[] buffer, ref int offset)
     {
         fixed (byte* ptr = buffer)
         {
-            var value = *(sbyte*) (ptr + offset);
+            var value = *(sbyte*)(ptr + offset);
             offset += byteSize;
             return value;
         }
@@ -208,15 +321,16 @@ public class XBuffer
     {
         fixed (byte* ptr = buffer)
         {
-            var value = *(bool*) (ptr + offset);
+            var value = *(bool*)(ptr + offset);
             offset += boolSize;
             return value;
         }
     }
+#endregion
 
-    #endregion
 }
 
 public class XBufferOutOfIndexException : System.Exception
 {
+
 }
