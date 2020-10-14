@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelConverter", "ExcelConverter\ExcelConverter.csproj", "{C6DC2106-2C8A-4A27-AA97-AD8D09CC31F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{2A93D5A0-8CAE-402C-A5BE-E5F5031C9B43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6DC2106-2C8A-4A27-AA97-AD8D09CC31F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6DC2106-2C8A-4A27-AA97-AD8D09CC31F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6DC2106-2C8A-4A27-AA97-AD8D09CC31F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6DC2106-2C8A-4A27-AA97-AD8D09CC31F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A93D5A0-8CAE-402C-A5BE-E5F5031C9B43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A93D5A0-8CAE-402C-A5BE-E5F5031C9B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A93D5A0-8CAE-402C-A5BE-E5F5031C9B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A93D5A0-8CAE-402C-A5BE-E5F5031C9B43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7CC38C4-CD32-44E6-BB2F-AEB077C7131C}
+	EndGlobalSection
+EndGlobal
