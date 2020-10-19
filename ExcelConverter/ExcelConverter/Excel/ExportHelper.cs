@@ -65,7 +65,7 @@ namespace ExcelReader.Excel
             {
                 ExcelReader excelReader = new ExcelReader();
                 ExcelPackage package = null;
-                List<SheetHeadInfo> headInfos = excelReader.ReadHeadInfo(fileList[i], out package);
+                List<SheetHeadInfo> headInfos = excelReader.ReadHeadInfo(fileList[i], etype, out package);
 
                 GenBin(headInfos, package, etype);
                 //Task.Run(()=> { GenBin(headInfos, package, etype); });

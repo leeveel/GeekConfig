@@ -47,14 +47,14 @@ namespace ExcelReader.Excel
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public List<SheetHeadInfo> ReadHeadInfo(string filePath, out ExcelPackage outPackage)
+        public List<SheetHeadInfo> ReadHeadInfo(string filePath, ExportType exportType, out ExcelPackage outPackage)
         {
             List<SheetHeadInfo> res = new List<SheetHeadInfo>();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage package = new ExcelPackage(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
             package.File = new FileInfo(filePath);
             outPackage = package;
-            List<int> validList = IsLegal(package);
+            List<int> validList = IsLegal(package, exportType);
             if (validList != null && validList.Count > 0)
             {
                 for (int i = 0; i < validList.Count; ++i)
@@ -90,8 +90,27 @@ namespace ExcelReader.Excel
                     //收集有效字段
                     for (int j = sheet.Dimension.Start.Column, k = sheet.Dimension.End.Column; j <= k; j++)
                     {
+                        bool needExport = false;
+                        if (j == sheet.Dimension.Start.Column)
+                        {
+                            needExport = true;
+                        }
+                        else
+                        {
+                            string estr = Obj2String(sheet.GetValue(FieldExportTypeRow, j));
+                            ExportType exType = GetExportType(estr);
+                            if (exType == ExportType.Both || exType == exportType)
+                            {
+                                needExport = true;
+                            }
+                            else if (exType == ExportType.Unknown)
+                            {
+                                LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, string.Format("未知的导出类型{0}行{1}列[{2}]", FieldNameRow, j, estr));
+                                continue;
+                            }
+                        }
                         string str = Obj2String(sheet.GetValue(FieldNameRow, j));
-                        if (str != null && str.StartsWith("t_"))
+                        if (str != null && str.StartsWith("t_") && needExport)
                         {
                             Field field = new Field();
                             field.Name = StringUtils.Trim(str);     //去除空格
@@ -181,8 +200,8 @@ namespace ExcelReader.Excel
             if (string.IsNullOrEmpty(type))
                 type = "cs";
             //全部转换成小写
-            type = type.ToLower();
-            if (type.Contains("cs") || type.Contains("sc"))
+            type = type.ToLower().Trim();
+            if (type.Equals("cs") || type.Equals("sc"))
                 return ExportType.Both;
             else if (type.Contains("c"))
                 return ExportType.Client;
@@ -195,7 +214,7 @@ namespace ExcelReader.Excel
         /// 表格是否合法
         /// </summary>
         /// <returns>返回合法的表单id</returns>
-        private List<int> IsLegal(ExcelPackage package)
+        private List<int> IsLegal(ExcelPackage package, ExportType exportType)
         {
             List<int> list = new List<int>();
             if (package != null 
@@ -212,17 +231,17 @@ namespace ExcelReader.Excel
                         LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "表名须以t_开头");
                         continue;
                     }
-                    //从0行开始
+                    //从1行开始
                     if (sheet.Dimension.Start.Row != 1)
                     {
-                        LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "需从0行开始");
+                        LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "需从1行开始");
                         continue;
                     }
 
-                    //从0列开始
+                    //从1列开始
                     if (sheet.Dimension.Start.Column != 1)
                     {
-                        LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "需从0列开始");
+                        LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "需从1列开始");
                         continue;
                     }
                     //至少有5行
@@ -238,7 +257,16 @@ namespace ExcelReader.Excel
                         LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "至少有2列");
                         continue;
                     }
-                        
+
+                    //导出类型
+                    string etype = Obj2String(sheet.GetValue(ExportTypeRow, PrimaryKeyCol));
+                    var Etype = GetExportType(etype);
+                    if (Etype != ExportType.Both && Etype != exportType)
+                    {
+                        LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "此表不需要在" + exportType.ToString() + "中导出");
+                        continue;
+                    }
+
                     //第2行至少有两列数据合法
                     int validColumnCount = 0;
                     for (int j = sheet.Dimension.Start.Column, k = sheet.Dimension.End.Column; j <= k; j++)
@@ -257,9 +285,6 @@ namespace ExcelReader.Excel
                         continue;
                     }
 
-                    //导出类型
-                    string etype = Obj2String(sheet.GetValue(ExportTypeRow, PrimaryKeyCol));
-                    var Etype = GetExportType(etype);
                     if (!IsExportCountLegal(Etype, sheet))
                     {
                         LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "导出字段个数需大于2");
@@ -282,7 +307,7 @@ namespace ExcelReader.Excel
             {
                 case ExportType.Unknown:
                     return false;
-                case ExportType.Client:
+                case ExportType.Server:
                     for (int j = sheet.Dimension.Start.Column, k = sheet.Dimension.End.Column; j <= k; j++)
                     {
                         //第一列必须全部导出
@@ -302,7 +327,7 @@ namespace ExcelReader.Excel
                         }
                     }
                     return scount >= 2;
-                case ExportType.Server:
+                case ExportType.Client:
                     for (int j = sheet.Dimension.Start.Column, k = sheet.Dimension.End.Column; j <= k; j++)
                     {
                         //第一列必须全部导出

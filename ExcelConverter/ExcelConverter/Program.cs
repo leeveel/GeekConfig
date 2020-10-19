@@ -18,9 +18,11 @@ namespace ExcelConverter
         [STAThread]
         static void Main()
         {
-#if (!DEBUG)
-            DllLoader.Load();
-#endif
+            //如果需要将工具依赖的DLL都打包进EXE，参考以下网址
+            //https://www.cnblogs.com/lip-blog/p/7365942.html
+//#if (!DEBUG)
+//            DllLoader.Load();
+//#endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             MainForm = new Form1();

@@ -15,7 +15,7 @@ namespace ExcelReader.Excel
         public string Name { set; get; }
 
         /// <summary>
-        /// 数据类型(驼峰命名会被模板查分为DataType==>Data_Type)
+        /// 数据类型(驼峰命名会被模板拆分为DataType==>Data_Type)
         /// (为保证模板和类属性一致，故用小写)
         /// </summary>
         public string Datatype { set; get; }
