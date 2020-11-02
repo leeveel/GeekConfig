@@ -71,18 +71,8 @@ public class XBuffer
 
         fixed (byte* ptr = buffer)
         {
-            //android il2cpp 闪退
-#if ENABLE_IL2CPP
-            var data = System.BitConverter.GetBytes(value);
-            fixed (byte* dataPtr = data)
-            {
-                int intVal = *(int*)dataPtr;
-                *(int*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(intVal);
-            }
-#else
-            *(float*)(ptr + offset) = value;
-            *(int*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(int*)(ptr+offset));
-#endif
+            *(float*) (ptr + offset) = value;
+            *(int*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(int*) (ptr + offset));
             offset += floatSize;
         }
     }
@@ -98,16 +88,8 @@ public class XBuffer
 
         fixed (byte* ptr = buffer)
         {
-            //android il2cpp 闪退
-#if ENABLE_IL2CPP            var data = System.BitConverter.GetBytes(value);
-            fixed (byte* dataPtr = data)
-            {
-                long longVal = *(long*)dataPtr;
-                *(long*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(longVal);
-            }       
-#else            *(double*)(ptr + offset) = value;
-            *(long*)(ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(long*)(ptr + offset));
-#endif
+            *(double*) (ptr + offset) = value;
+            *(long*) (ptr + offset) = System.Net.IPAddress.HostToNetworkOrder(*(long*) (ptr + offset));
             offset += doubleSize;
         }
     }
@@ -171,14 +153,22 @@ public class XBuffer
         fixed (byte* ptr = buffer)
         {
             int len = 0;
-            try
+            if(offset >= buffer.Length)
             {
-                len = System.Text.Encoding.UTF8.GetBytes(value, 0, value.Length, buffer, offset + shortSize);
-            }catch(Exception e)
-            {
+                //预判已经超出长度了，直接计算长度就行了
                 len = System.Text.Encoding.UTF8.GetBytes(value).Length + shortSize;
-                if (offset + len <= buffer.Length)
-                    throw e;
+            }else
+            {
+                try
+                {
+                    len = System.Text.Encoding.UTF8.GetBytes(value, 0, value.Length, buffer, offset + shortSize);
+                }
+                catch (Exception e)
+                {
+                    len = System.Text.Encoding.UTF8.GetBytes(value).Length + shortSize;
+                    if (offset + len <= buffer.Length)
+                        throw e;
+                }
             }
 
             if (offset + len + shortSize > buffer.Length)
@@ -207,9 +197,9 @@ public class XBuffer
             offset += boolSize;
         }
     }
-#endregion
+    #endregion
 
-#region Read
+    #region Read
 
     public static unsafe int ReadInt(byte[] buffer, ref int offset)
     {
@@ -247,11 +237,8 @@ public class XBuffer
         {
             *(int*)(ptr + offset) = System.Net.IPAddress.NetworkToHostOrder(*(int*)(ptr + offset));
             //android 会il2cpp闪退
-#if ENABLE_IL2CPP
-            var value = System.BitConverter.ToSingle(buffer, offset);
-#else
             var value = *(float*)(ptr + offset);
-#endif
+            //var value = System.BitConverter.ToSingle(buffer, offset);
             offset += floatSize;
             return value;
         }
@@ -263,11 +250,8 @@ public class XBuffer
         {
             *(long*)(ptr + offset) = System.Net.IPAddress.NetworkToHostOrder(*(long*)(ptr + offset));
             //android 会il2cpp闪退
-#if ENABLE_IL2CPP
-            var value = System.BitConverter.ToDouble(buffer, offset);
-#else
             var value = *(double*)(ptr + offset);
-#endif
+            //var value = System.BitConverter.ToDouble(buffer, offset);
             offset += doubleSize;
             return value;
         }
@@ -326,7 +310,7 @@ public class XBuffer
             return value;
         }
     }
-#endregion
+    #endregion
 
 }
 
