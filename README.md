@@ -29,3 +29,4 @@ https://github.com/CodeZeg/xbuffer 性能非常高
 ### 说明
 Configs/config.xml: 可以对工具相关路径进行设置  
 Configs/Template: 工程中的client和server模板是一样的，可以根据自己的需求修改
+![Image text](https://github.com/leeveel/ExcelToCode/blob/main/Doc/configtool.png)
