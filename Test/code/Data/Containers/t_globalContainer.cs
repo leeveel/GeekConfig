@@ -45,7 +45,7 @@ namespace Data.Containers
 				{
 					int offset = 0;
 					//filed count��int��+ field type��byte��(0:int 1:long 2:string 3:float)
-					offset = 48;  
+					offset = 42;  
 					while (data.Length > offset)
 					{
 						t_globalBean bean = new t_globalBean();

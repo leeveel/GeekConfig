@@ -45,7 +45,7 @@ namespace Data.Containers
 				{
 					int offset = 0;
 					//filed count��int��+ field type��byte��(0:int 1:long 2:string 3:float)
-					offset = 184;  
+					offset = 156;  
 					while (data.Length > offset)
 					{
 						t_monsterBean bean = new t_monsterBean();

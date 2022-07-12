@@ -26,7 +26,7 @@ namespace Data.Beans
 			else
 			{
 				//ignore no need language
-				int slen = XBuffer.ReadInt(data, ref offset);
+				short slen = XBuffer.ReadShort(data, ref offset);
 				offset += slen;
 			}
 
@@ -38,7 +38,7 @@ namespace Data.Beans
 			else
 			{
 				//ignore no need language
-				int slen = XBuffer.ReadInt(data, ref offset);
+				short slen = XBuffer.ReadShort(data, ref offset);
 				offset += slen;
 			}
 
@@ -50,7 +50,7 @@ namespace Data.Beans
 			else
 			{
 				//ignore no need language
-				int slen = XBuffer.ReadInt(data, ref offset);
+				short slen = XBuffer.ReadShort(data, ref offset);
 				offset += slen;
 			}
 
