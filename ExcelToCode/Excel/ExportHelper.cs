@@ -1,5 +1,6 @@
 ﻿using DotLiquid;
 using ExcelConverter.Utils;
+using MessagePack;
 using NLog;
 using OfficeOpenXml;
 using System;
@@ -15,16 +16,6 @@ namespace ExcelToCode.Excel
         private static readonly NLog.Logger LOGGER = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// 普通配置表缓存
-        /// </summary>
-        public static byte[] NormalBuffer = null;
-
-        /// <summary>
-        /// 语言包缓存
-        /// </summary>
-        public static byte[] LanguageBuffer = null;
-
-        /// <summary>
         /// 是否初始化 
         /// </summary>
         private static bool IsInited = false;
@@ -34,8 +25,6 @@ namespace ExcelToCode.Excel
             if (IsInited)
                 return;
             IsInited = true;
-            NormalBuffer = new byte[Setting.NormalBufferSize];
-            LanguageBuffer = new byte[Setting.LanguageBufferSize];
         }
 
         public static void Export(ExportType etype, List<string> fileList, bool isAll)
@@ -70,14 +59,14 @@ namespace ExcelToCode.Excel
                 GenBin(headInfos, package, etype);
                 //Task.Run(()=> { GenBin(headInfos, package, etype); });
                 GenBeanAddContainer(headInfos, etype, mgrInfo);
-             
+
 
                 LogUtil.AddNormalLog(package.File.Name, "导表完成");
 
                 if (package != null)
                     package.Dispose();
             }
-
+            GenDeserializeProxy(etype);
             GenGameDataManager(mgrInfo, etype, isAll);
             ExcelToCode.Program.MainForm.ToggleAllBtn(true);
             LogUtil.Add("---------导表完成-------------");
@@ -86,7 +75,7 @@ namespace ExcelToCode.Excel
         private static void GenBeanAddContainer(List<SheetHeadInfo> headInfos, ExportType etype, DataMgrInfo mgrInfo)
         {
             string beanPath = Setting.GetCodePath(etype) + @"/Data/Beans/";
-            if(!Directory.Exists(beanPath))
+            if (!Directory.Exists(beanPath))
                 Directory.CreateDirectory(beanPath);
             string containerPath = Setting.GetCodePath(etype) + @"/Data/Containers/";
             if (!Directory.Exists(containerPath))
@@ -100,7 +89,7 @@ namespace ExcelToCode.Excel
             {
                 if (info.SheetName == "t_language")
                 {
-                    string lanTemplatePath = Setting.GetTemplatePath(etype) + "/LanBean.template";
+                    string lanTemplatePath = Setting.GetTemplatePath(etype) + "/LanguageBean.template";
                     Template lanTemplate = Template.Parse(File.ReadAllText(lanTemplatePath));
                     content = lanTemplate.Render(Hash.FromAnonymousObject(info));
                     File.WriteAllText(beanPath + info.BeanClassName + ".cs", content);
@@ -113,10 +102,14 @@ namespace ExcelToCode.Excel
             }
 
             templatePath = Setting.GetTemplatePath(etype) + "/Container.template";
-            template = Template.Parse(File.ReadAllText(templatePath));
+            var commonTemplate = Template.Parse(File.ReadAllText(templatePath));
+
+            templatePath = Setting.GetTemplatePath(etype) + "/LanguageContainer.template";
+            var langTemplate = Template.Parse(File.ReadAllText(templatePath));
+
             foreach (var info in headInfos)
             {
-                content = template.Render(Hash.FromAnonymousObject(info));
+                content = (info.SheetName == "t_language" ? langTemplate : commonTemplate).Render(Hash.FromAnonymousObject(info));
                 File.WriteAllText(containerPath + info.ContainerClassName + ".cs", content);
             }
 
@@ -150,8 +143,8 @@ namespace ExcelToCode.Excel
                 int index = content.IndexOf("@%@%@");
                 if (index != -1)
                 {
-                    if(content.IndexOf(part1) < 0)
-                        content = content.Insert(index-6, "\r\n\t\t" + part1);
+                    if (content.IndexOf(part1) < 0)
+                        content = content.Insert(index - 6, "\r\n\t\t" + part1);
                 }
                 else
                 {
@@ -162,7 +155,7 @@ namespace ExcelToCode.Excel
                 if (index != -1)
                 {
                     if (content.IndexOf(part2) < 0)
-                        content = content.Insert(index-6, "\r\n\t\t\t" + part2);
+                        content = content.Insert(index - 6, "\r\n\t\t\t" + part2);
                 }
                 else
                 {
@@ -173,7 +166,7 @@ namespace ExcelToCode.Excel
                 if (index != -1)
                 {
                     if (content.IndexOf(part3) < 0)
-                        content = content.Insert(index-6, "\r\n\t\t\t" + part3);
+                        content = content.Insert(index - 6, "\r\n\t\t\t" + part3);
                 }
                 else
                 {
@@ -184,9 +177,20 @@ namespace ExcelToCode.Excel
             }
         }
 
+        private static void GenDeserializeProxy(ExportType etype)
+        {
+            string path = Setting.GetCodePath(etype) + @"/Data/SheetDeserializeProxy.cs";
+            string templatePath = Setting.GetTemplatePath(etype) + "/SheetDeserializeProxy.template";
+            Template template = Template.Parse(File.ReadAllText(templatePath));
+            var str = template.Render();
+            File.WriteAllText(path, str);
+        }
+
 
         private static void GenBin(List<SheetHeadInfo> headInfos, ExcelPackage package, ExportType etype)
         {
+            var msgPackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
+
             for (int i = 0; i < headInfos.Count; i++)
             {
                 SheetHeadInfo headInfo = headInfos[i];
@@ -194,48 +198,16 @@ namespace ExcelToCode.Excel
                 //空表没有数据
                 if (ExcelReader.DataStartRow > sheet.Dimension.End.Row)
                     continue;
-                //首先清空缓冲区
-                byte[] byteArr = null;
-                if (headInfo.SheetName == "t_language")
-                {
-                    Array.Clear(LanguageBuffer, 0, LanguageBuffer.Length);
-                    byteArr = LanguageBuffer;
-                }
-                else
-                {
-                    Array.Clear(NormalBuffer, 0, NormalBuffer.Length);
-                    byteArr = NormalBuffer;
-                }
-                int offset = 0;
-                //写入文件头----表名string-字段数量byte-字段类型byte (0:int 1:long 2:string 3:float)
-                //XBuffer.WriteString(headInfos[i].SheetName, byteArr, ref offset);
-                XBuffer.WriteInt(headInfos[i].Fields.Count, byteArr, ref offset);
-                for (int k = 0; k < headInfos[i].Fields.Count; k++)
-                {
-                    Field field = headInfos[i].Fields[k];
-                    switch (field.Datatype)
-                    {
-                        case DataType.Int:
-                        case DataType.TextMult:
-                            XBuffer.WriteByte(0, byteArr, ref offset);
-                            break;
-                        case DataType.Long:
-                            XBuffer.WriteByte(1, byteArr, ref offset);
-                            break;
-                        case DataType.Text:
-                        case DataType.String:
-                            XBuffer.WriteByte(2, byteArr, ref offset);
-                            break;
-                        case DataType.Float:
-                            XBuffer.WriteByte(3, byteArr, ref offset);
-                            break;
-                        default:
-                            //抛异常
-                            break;
-                    }
 
+                var proxy = new SheetDeserializeProxy<object>();
+                proxy.sheetName = headInfos[i].SheetName;
+                var fieldNames = new List<string>();
+                var datas = new List<List<object>>(sheet.Dimension.End.Row - ExcelReader.DataStartRow);
+                proxy.fieldNames = fieldNames;
+                proxy.datas = datas;
 
-                }
+                bool splitColumn = headInfo.SheetName == "t_language";
+
                 for (int k = 0; k < headInfo.Fields.Count; k++)
                 {
                     var content = "";
@@ -246,16 +218,14 @@ namespace ExcelToCode.Excel
                     content = content.Trim();
                     //处理换行符
                     content = content.Replace(@"\n", "\n");
-                    XBuffer.WriteString(content, byteArr, ref offset);
+                    fieldNames.Add(content);
                 }
-
-                headInfo.ContentStartOffset = offset;
 
                 //写入数据
                 for (int m = ExcelReader.DataStartRow, n = sheet.Dimension.End.Row; m <= n; m++)
                 {
-                    //为了严格保证有序，遍历List,不遍历dictionary
-                    //foreach (KeyValuePair<int, Field> item in headInfos[i].ValidFileds)
+                    var data = new List<object>();
+
                     for (int j = 0; j < headInfos[i].Fields.Count; j++)
                     {
                         int col = headInfos[i].Fields[j].Col;
@@ -269,16 +239,18 @@ namespace ExcelToCode.Excel
                         //排除id为0的数据行
                         if (j == 0 && string.IsNullOrEmpty(content))
                         {
+                            data = null;
                             break;
                         }
 
+                        object value = null;
                         switch (field.Datatype)
                         {
                             case DataType.Int:
                             case DataType.TextMult:
                                 int intVal = 0;
                                 int.TryParse(content, out intVal);
-                                XBuffer.WriteInt(intVal, byteArr, ref offset);
+                                value = intVal;
                                 break;
                             case DataType.Text:
                             case DataType.String:
@@ -287,26 +259,47 @@ namespace ExcelToCode.Excel
                                 content = content.Trim();
                                 //处理换行符
                                 content = content.Replace(@"\n", "\n");
-                                XBuffer.WriteString(content, byteArr, ref offset);
+                                value = content;
                                 break;
                             case DataType.Float:
                                 float floatVal = 0;
                                 float.TryParse(content, out floatVal);
-                                XBuffer.WriteFloat(floatVal, byteArr, ref offset);
+                                value = floatVal;
                                 break;
                             case DataType.Long:
                                 long longVal = 0;
                                 long.TryParse(content, out longVal);
-                                XBuffer.WriteLong(longVal, byteArr, ref offset);
+                                value = longVal;
                                 break;
                             default:
                                 //抛异常
                                 break;
                         }
+                        data.Add(value);
+                    }
+                    if (data != null)
+                        datas.Add(data);
+                }
+
+                if (splitColumn)
+                {
+                    for (int k = 1; k < headInfo.Fields.Count; k++)
+                    {
+                        var colDatas = new List<List<object>>();
+                        proxy.datas = colDatas;
+                        foreach (var d in datas)
+                        {
+                            colDatas.Add(new List<object> { d[0], d[k] });
+                        }
+                        var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy, msgPackOption);
+                        System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + headInfo.Fields[k].Name.Replace("t_", "") + "Bean.bytes", dataBytes);
                     }
                 }
-                //将数据写入磁盘
-                System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.bytes", GetValidData(byteArr, offset));
+                else
+                {
+                    var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy, msgPackOption);
+                    System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.bytes", dataBytes);
+                }
             }
         }
 

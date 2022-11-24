@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Auto generated, do not edit it client
- * 语言包表
+ * {{SheetNameDesc}}
  */
 using Data.Containers;
 using Base;
@@ -9,7 +9,7 @@ using MessagePack;
 namespace Data.Beans
 {
     [MessagePackObject(false)]
-    public class t_languageBean : BaseBin
+    public class {{BeanClassName}} : BaseBin
     { 
         [Key(0)]
 		public int t_id;

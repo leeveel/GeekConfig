@@ -3,21 +3,25 @@
  */
 using Data.Containers;
 using Base;
+using MessagePack;
 
 namespace Data.Beans 
 {
 	///<summary>{{SheetNameDesc}}</summary>
+    [MessagePackObject(false)]
     public class {{BeanClassName}} : BaseBin
     {
         {%- for field in Fields -%}
-        {%- if field.Datatype == "textmult" -%}
-        private int m_{{field.Name}};
+        {%- if field.Datatype == "textmult" -%} 
+        [Key({{field.Serializeid}})]
+        public int m_{{field.Name}};
 		///<summary>{{field.Desc}}</summary>
+		[IgnoreMember]
         public string {{field.name}}
 		{
 			get           
 			{
-				if(m_{{field.Name}} == 0)
+				if(m_{{field.Name}} == 0) 
 					return "";
 				t_languageBean lanBean = ConfigBean.GetBean<t_languageBean, int>(m_{{field.Name}});
 				if (lanBean != null)
@@ -28,24 +32,9 @@ namespace Data.Beans
 		}
         {%- else -%}
 		///<summary>{{field.Desc}}</summary>
+        [Key({{field.Serializeid}})]
         public {{field.Datatype}} {{field.Name}};
 		{%- endif -%}
-        {%- endfor -%}
-
-        public void LoadData(byte[] data, ref int offset)
-        {
-            {%- for field in Fields -%}
-            {%- if field.Datatype == "int" -%}
-            {{field.Name}} = XBuffer.ReadInt(data, ref offset);
-            {%- elsif field.Datatype == "long" -%}
-            {{field.Name}} = XBuffer.ReadLong(data, ref offset);
-			{%- elsif field.Datatype == "textmult" -%}
-            m_{{field.Name}} = XBuffer.ReadInt(data, ref offset);
-			{%- elsif field.Datatype == "string" -%}
-			{{field.Name}} = XBuffer.ReadString(data, ref offset);
-            {%- endif -%}
-            {%- endfor -%}
-        }
-
+        {%- endfor -%} 
     }
 }

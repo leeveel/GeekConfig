@@ -10,11 +10,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Data.Beans;
+using MessagePack;
 
 namespace Data.Containers
 {
 	public class t_monsterContainer : BaseContainer
-	{
+	{ 
 		private List<t_monsterBean> list = new List<t_monsterBean>();
 		private Dictionary<int, t_monsterBean> map = new Dictionary<int, t_monsterBean>();
 
@@ -43,19 +44,15 @@ namespace Data.Containers
 			{
 				try
 				{
-					int offset = 0;
-					//filed count��int��+ field type��byte��(0:int 1:long 2:string 3:float)
-					offset = 156;  
-					while (data.Length > offset)
-					{
-						t_monsterBean bean = new t_monsterBean();
-						bean.LoadData(data, ref offset);
-						list.Add(bean);
-						if(!map.ContainsKey(bean.t_id))
-							map.Add(bean.t_id, bean);
-						else
-							Debuger.Err("Exist duplicate Key: " + bean.t_id + " t_monsterBean");
-					}
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<t_monsterBean>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
+                    list = proxy.datas;
+                    foreach (var d in list)
+                    {
+                        if (!map.ContainsKey(d.t_id))
+                            map.Add(d.t_id, d);
+                        else
+                            Debuger.Err("Exist duplicate Key: " + d.t_id + " t_monsterBean");
+                    }
 				}
 				catch (Exception ex)
 				{

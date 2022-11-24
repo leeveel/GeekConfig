@@ -1,7 +1,7 @@
 /**
  * Auto generated, do not edit it server
  *
- * 语言包表
+ * {{SheetNameDesc}}
  */
 
 using Base;
@@ -14,24 +14,24 @@ using MessagePack;
 
 namespace Data.Containers
 {
-	public class t_languageContainer : BaseContainer
+	public class {{ContainerClassName}} : BaseContainer
 	{
-		private List<t_languageBean> list = new List<t_languageBean>();
-		private Dictionary<int, t_languageBean> map = new Dictionary<int, t_languageBean>();
+		private List<{{BeanClassName}}> list = new List<{{BeanClassName}}>();
+		private Dictionary<{{PrimaryKeyType}}, {{BeanClassName}}> map = new Dictionary<{{PrimaryKeyType}}, {{BeanClassName}}>();
 
-		//public override List<t_languageBean> getList()
+		//public override List<{{BeanClassName}}> getList()
 		public override IList getList()
 		{
 			return list;
 		}
 
-		//public override Dictionary<int, t_languageBean> getMap()
+		//public override Dictionary<{{PrimaryKeyType}}, {{BeanClassName}}> getMap()
 		public override IDictionary getMap()
 		{
 			return map;
 		}
 		
-		public Type BinType = typeof(t_languageBean);
+		public Type BinType = typeof({{BeanClassName}});
 
 		public override void loadDataFromBin()
 		{    
@@ -45,24 +45,24 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<t_languageBean>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<{{BeanClassName}}>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
                     list = proxy.datas;
                     foreach (var d in list)
                     {
                         if (!map.ContainsKey(d.t_id))
                             map.Add(d.t_id, d);
                         else
-                            Debuger.Err("Exist duplicate Key: " + d.t_id + " t_languageBean");
+                            Debuger.Err("Exist duplicate Key: " + d.t_id + " {{BeanClassName}}");
                     }
 				}
 				catch (Exception ex)
 				{
-					Debuger.Err("import data error: t_languageBean >>" + ex.ToString());
+					Debuger.Err("import data error: {{BeanClassName}} >>" + ex.ToString());
 				}
 			}
 			else
 			{
-				Debuger.Err("can not find conf data: t_languageBean.bytes");
+				Debuger.Err("can not find conf data: {{BeanClassName}}.bytes");
 			}
 		}
 		

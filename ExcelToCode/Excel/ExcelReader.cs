@@ -141,7 +141,7 @@ namespace ExcelToCode.Excel
                             {
                                 if (DataType.IsLegal(str))
                                 {
-                                    field.Datatype = DataType.GetTrueTyped(str); 
+                                    field.Datatype = DataType.GetTrueTyped(str);
                                 }
                                 else
                                 {
@@ -209,7 +209,7 @@ namespace ExcelToCode.Excel
                 return ExportType.Server;
             return ExportType.Unknown;
         }
-    
+
         /// <summary>
         /// 表格是否合法
         /// </summary>
@@ -217,9 +217,9 @@ namespace ExcelToCode.Excel
         private List<int> IsLegal(ExcelPackage package, ExportType exportType)
         {
             List<int> list = new List<int>();
-            if (package != null 
-                && package.Workbook != null 
-                && package.Workbook.Worksheets != null 
+            if (package != null
+                && package.Workbook != null
+                && package.Workbook.Worksheets != null
                 && package.Workbook.Worksheets.Count > 0)
             {
                 for (int i = 0; i < package.Workbook.Worksheets.Count; ++i)
@@ -290,7 +290,7 @@ namespace ExcelToCode.Excel
                         LogUtil.AddIgnoreLog(package.File.Name, sheet.Name, "导出字段个数需大于2");
                         continue;
                     }
-                        
+
                     //合法表单 
                     list.Add(i);
                 }

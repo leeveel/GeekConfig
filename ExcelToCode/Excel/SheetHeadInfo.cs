@@ -37,7 +37,6 @@ namespace ExcelToCode.Excel
         /// </summary>
         public ExportType Etype = ExportType.Both;
 
-
         /// <summary>
         /// Bean类名字
         /// </summary>
@@ -68,15 +67,13 @@ namespace ExcelToCode.Excel
         /// </summary>
         public int FieldCount
         {
-            get 
+            get
             {
-                if(Fields == null)
+                if (Fields == null)
                     return 0;
                 return Fields.Count;
             }
         }
-
-        public int ContentStartOffset { get; set; }
 
         /// <summary>
         /// 
@@ -95,6 +92,7 @@ namespace ExcelToCode.Excel
             if (!ValidFileds.ContainsKey(key))
             {
                 ValidFileds.Add(key, field);
+                field.Serializeid = Fields.Count.ToString();
                 Fields.Add(field);
             }
             else
@@ -102,6 +100,5 @@ namespace ExcelToCode.Excel
                 LOGGER.Info("重复添加key:{}", key);
             }
         }
-
     }
 }

@@ -87,10 +87,10 @@ namespace Data.Containers
 		public void LoadOneBean<T>(bool forceReload = false) where T : BaseBin
         {
 			Type t = typeof(T);
-			LoadOneBean(t, forceReload);
+			LoadOneBean(t,forceReload);
         }
 		
-		public void LoadOneBean(Type t, bool forceReload = false)
+		public void LoadOneBean(Type t,bool forceReload = false)
 		{
             if (t_containerMap.ContainsKey(t))
             {

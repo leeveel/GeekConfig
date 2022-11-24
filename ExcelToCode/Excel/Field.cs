@@ -9,6 +9,8 @@ namespace ExcelToCode.Excel
 
         public int Row;
 
+        public string Serializeid { set; get; }
+
         /// <summary>
         /// 字段名
         /// </summary>

@@ -5,9 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-	<PropertyGroup>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	</PropertyGroup>
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -22,10 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="code\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="MessagePack" Version="2.4.59" />
     <PackageReference Include="NLog" Version="4.7.5" />
   </ItemGroup>
 

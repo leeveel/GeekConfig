@@ -10,11 +10,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Data.Beans;
+using MessagePack;
 
 namespace Data.Containers
 {
 	public class {{ContainerClassName}} : BaseContainer
-	{
+	{ 
 		private List<{{BeanClassName}}> list = new List<{{BeanClassName}}>();
 		private Dictionary<{{PrimaryKeyType}}, {{BeanClassName}}> map = new Dictionary<{{PrimaryKeyType}}, {{BeanClassName}}>();
 
@@ -43,19 +44,15 @@ namespace Data.Containers
 			{
 				try
 				{
-					int offset = 0;
-					//filed count£¨int£©+ field type£¨byte£©(0:int 1:long 2:string 3:float)
-					offset = {{ContentStartOffset}};  
-					while (data.Length > offset)
-					{
-						{{BeanClassName}} bean = new {{BeanClassName}}();
-						bean.LoadData(data, ref offset);
-						list.Add(bean);
-						if(!map.ContainsKey(bean.t_id))
-							map.Add(bean.t_id, bean);
-						else
-							Debuger.Err("Exist duplicate Key: " + bean.t_id + " {{BeanClassName}}");
-					}
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<{{BeanClassName}}>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
+                    list = proxy.datas;
+                    foreach (var d in list)
+                    {
+                        if (!map.ContainsKey(d.t_id))
+                            map.Add(d.t_id, d);
+                        else
+                            Debuger.Err("Exist duplicate Key: " + d.t_id + " {{BeanClassName}}");
+                    }
 				}
 				catch (Exception ex)
 				{
