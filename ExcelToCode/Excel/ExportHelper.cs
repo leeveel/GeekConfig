@@ -318,7 +318,7 @@ namespace ExcelToCode.Excel
                 {
                     var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy, msgPackOption);
                     System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.bytes", dataBytes);
-                    System.IO.File.WriteAllText(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.txt", MessagePack.MessagePackSerializer.SerializeToJson(proxy));
+                    //System.IO.File.WriteAllText(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.txt", MessagePack.MessagePackSerializer.SerializeToJson(proxy));
                 }
             }
         }
