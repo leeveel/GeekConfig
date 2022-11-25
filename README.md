@@ -23,9 +23,6 @@ var list = ConfigBean.GetBeanList<t_monsterBean>();
 foreach (var item in list)  
     Console.WriteLine(item.t_name + "-------" + item.t_skill);
 
-### 基于xbuffer解析数据
-https://github.com/CodeZeg/xbuffer 性能非常高
-
 ### 说明
 Configs/config.xml: 可以对工具相关路径进行设置  
 Configs/Template: 工程中的client和server模板是一样的，可以根据自己的需求修改
