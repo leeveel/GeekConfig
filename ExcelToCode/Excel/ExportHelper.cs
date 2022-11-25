@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace ExcelToCode.Excel
 {
@@ -186,6 +187,56 @@ namespace ExcelToCode.Excel
             File.WriteAllText(path, str);
         }
 
+        private static object GetValue(string content, string elementType, bool isArray, string splitChar)
+        {
+            if (isArray)
+            {
+                var list = new List<object>();
+                var strs = content.Split(splitChar);
+                foreach (var s in strs)
+                {
+                    if (string.IsNullOrWhiteSpace(content))
+                        continue;
+                    list.Add(GetValue(s, elementType, false, splitChar));
+                }
+                return list;
+            }
+            else
+            {
+                object value = null;
+                switch (elementType)
+                {
+                    case "int":
+                    case DataType.TextMult:
+                        int intVal = 0;
+                        int.TryParse(content, out intVal);
+                        value = intVal;
+                        break;
+                    case "string":
+                        if (string.IsNullOrEmpty(content))
+                            content = "";
+                        content = content.Trim();
+                        //处理换行符
+                        content = content.Replace(@"\n", "\n");
+                        value = content;
+                        break;
+                    case "float":
+                        float floatVal = 0;
+                        float.TryParse(content, out floatVal);
+                        value = floatVal;
+                        break;
+                    case "long":
+                        long longVal = 0;
+                        long.TryParse(content, out longVal);
+                        value = longVal;
+                        break;
+                    default:
+                        break;
+                }
+                return value;
+            }
+        }
+
 
         private static void GenBin(List<SheetHeadInfo> headInfos, ExcelPackage package, ExportType etype)
         {
@@ -243,39 +294,7 @@ namespace ExcelToCode.Excel
                             break;
                         }
 
-                        object value = null;
-                        switch (field.Datatype)
-                        {
-                            case DataType.Int:
-                            case DataType.TextMult:
-                                int intVal = 0;
-                                int.TryParse(content, out intVal);
-                                value = intVal;
-                                break;
-                            case DataType.Text:
-                            case DataType.String:
-                                if (string.IsNullOrEmpty(content))
-                                    content = "";
-                                content = content.Trim();
-                                //处理换行符
-                                content = content.Replace(@"\n", "\n");
-                                value = content;
-                                break;
-                            case DataType.Float:
-                                float floatVal = 0;
-                                float.TryParse(content, out floatVal);
-                                value = floatVal;
-                                break;
-                            case DataType.Long:
-                                long longVal = 0;
-                                long.TryParse(content, out longVal);
-                                value = longVal;
-                                break;
-                            default:
-                                //抛异常
-                                break;
-                        }
-                        data.Add(value);
+                        data.Add(GetValue(content, field.Elementtype, field.IsArray, field.ArraySplitChar));
                     }
                     if (data != null)
                         datas.Add(data);
@@ -299,6 +318,7 @@ namespace ExcelToCode.Excel
                 {
                     var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy, msgPackOption);
                     System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.bytes", dataBytes);
+                    System.IO.File.WriteAllText(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.txt", MessagePack.MessagePackSerializer.SerializeToJson(proxy));
                 }
             }
         }

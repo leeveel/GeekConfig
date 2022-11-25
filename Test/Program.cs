@@ -24,6 +24,10 @@ namespace Test
             if (bean != null)
                 Console.WriteLine(bean.t_string_param);
 
+            var globalList = ConfigBean.GetBeanList<t_globalBean>();
+            foreach (var item in globalList)
+                Console.WriteLine(item.t_id + "-------" + item.t_array_param.Count);
+
             var list = ConfigBean.GetBeanList<t_monsterBean>();
             foreach (var item in list)
                 Console.WriteLine(item.t_name + "-------" + item.t_skill);

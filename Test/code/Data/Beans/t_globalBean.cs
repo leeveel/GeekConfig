@@ -4,6 +4,7 @@
 using Data.Containers;
 using Base;
 using MessagePack;
+using System.Collections.Generic;
 
 namespace Data.Beans 
 {
@@ -20,6 +21,9 @@ namespace Data.Beans
 		///<summary>字符串</summary>
         [Key(2)]
         public string t_string_param;
+		///<summary>字符串</summary>
+        [Key(3)]
+        public List<int> t_array_param;
 
     }
 }

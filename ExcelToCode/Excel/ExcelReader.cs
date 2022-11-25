@@ -85,7 +85,7 @@ namespace ExcelToCode.Excel
                     if (string.IsNullOrEmpty(keyStr))
                         keyStr = "int";
                     if (DataType.IsLegal(keyStr))
-                        headInfo.PrimaryKeyType = DataType.GetTrueTyped(keyStr);
+                        headInfo.PrimaryKeyType = DataType.GetTrueTyped(keyStr).Item1;
 
                     //收集有效字段
                     for (int j = sheet.Dimension.Start.Column, k = sheet.Dimension.End.Column; j <= k; j++)
@@ -141,7 +141,10 @@ namespace ExcelToCode.Excel
                             {
                                 if (DataType.IsLegal(str))
                                 {
-                                    field.Datatype = DataType.GetTrueTyped(str);
+                                    var typeinfo = DataType.GetTrueTyped(str);
+                                    field.Elementtype = typeinfo.Item1;
+                                    field.IsArray = typeinfo.Item2;
+                                    field.ArraySplitChar = typeinfo.Item3;
                                 }
                                 else
                                 {
