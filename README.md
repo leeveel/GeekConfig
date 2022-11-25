@@ -11,13 +11,24 @@ API简洁，使用方便，性能高
 - long   
 - float
 - textmult(多语言处理，代表这个字段会从语言表中读取真正的值)
-- 自定义枚举(在@typedefine.xlsx enumdef表中定义)
+- 自定义枚举(在@typedefine.xlsx enumdef表中定义)    
 - 以及上述类型的数组类型(字段填写方式: int[];  类型[]分割符)   
 - 自定义结构(在@typedefine.xlsx classdef表中定义,结构基础类型包含以上类型) 
 
 4.第四行：第一列为表名（主键列，一定会导出），后续的列可以通过填c,s,cs,sc来控制是否需要导出（c:client s:server,不填代表cs）  
 5.第五行：字段备注  
 6.表单名字必须以t_开头（非t_开头表单不会被导出）,支持多个表单  
+
+7.示例   
+|cs|  |  |  |   |    |   |   |  |
+| -|- | -| -| -| -| - | - | - |
+|t_id|t_int_param|t_string_param|t_array_param|t_enum_Param|t_enumArray_Param|t_testclass_Param|    
+| | |text|int[];|SkillTarget|SkillTarget[];|TestClass|   
+全局表|   
+|id|说明1|说明2| | | | |  
+|1010001|4|字符串测试|1;2;3;4;5;5;5|自己|敌人;同伴|	x:2 y:3 z:4 lan:1000 str:test字符串 
+
+
 
 ### 支持按需加载/启动时全部加载（非线程安全）
 GameDataManager.Instance.LoadAll();  
