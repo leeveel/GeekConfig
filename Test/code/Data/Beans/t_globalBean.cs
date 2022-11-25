@@ -31,6 +31,9 @@ namespace Data.Beans
 		///<summary></summary>
         [Key(5)]
         public List<SkillTarget> t_enumArray_Param;
+		///<summary></summary>
+        [Key(6)]
+        public TestClass t_testclass_Param;
 
     }
 }

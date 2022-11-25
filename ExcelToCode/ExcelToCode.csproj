@@ -28,6 +28,9 @@
     <None Update="Configs\NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Configs\Template\Client\ClassDef.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Configs\Template\Client\EnumDef.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -53,6 +56,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Configs\Template\Server\Container.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Configs\Template\Server\EnumDef.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Configs\Template\Server\GameDataManager.template">

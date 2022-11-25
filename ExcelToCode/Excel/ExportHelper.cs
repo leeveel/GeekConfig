@@ -52,6 +52,36 @@ namespace ExcelToCode.Excel
                         DataType.AddEnum(newEnum);
                     }
                 }
+                else if (sheetDatas.Key == "classdef")
+                {
+                    foreach (var rowData in sheetDatas.Value)
+                    {
+                        if (rowData.Count == 0 || string.IsNullOrEmpty(rowData[0]))
+                        {
+                            continue;
+                        }
+                        var newClass = new ClassType();
+                        newClass.Name = rowData[0];
+                        for (int i = 1; i < rowData.Count; i++)
+                        {
+                            if (string.IsNullOrEmpty(rowData[i]))
+                                continue;
+                            var strs = rowData[i].Trim().Split(":", StringSplitOptions.RemoveEmptyEntries);
+                            if (strs.Length < 2)
+                            {
+                                LogUtil.AddIgnoreLog(filePath, "classdef", $"错误的类字段定义{rowData[i]}");
+                                continue;
+                            }
+
+                            var err = newClass.AddField(strs[0].Trim(), strs[1].Trim());
+                            if (err != null)
+                            {
+                                LogUtil.AddIgnoreLog(filePath, "classdef", err);
+                            }
+                        }
+                        DataType.AddClass(newClass);
+                    }
+                }
             }
         }
 
@@ -126,6 +156,11 @@ namespace ExcelToCode.Excel
             Template template = Template.Parse(File.ReadAllText(templatePath));
             var content = template.Render(Hash.FromAnonymousObject(mgrInfo));
             File.WriteAllText(targetPath + "/DataEnum.cs", content);
+
+            templatePath = Setting.GetTemplatePath(etype) + "/ClassDef.template";
+            template = Template.Parse(File.ReadAllText(templatePath));
+            content = template.Render(Hash.FromAnonymousObject(mgrInfo));
+            File.WriteAllText(targetPath + "/DataClass.cs", content);
         }
 
         private static void GenBeanAddContainer(List<SheetHeadInfo> headInfos, ExportType etype, DataMgrInfo mgrInfo)
@@ -288,7 +323,7 @@ namespace ExcelToCode.Excel
                     default:
                         if (string.IsNullOrEmpty(elementType))
                         {
-                            LogUtil.AddIgnoreLog(tableFile, sheetName, $"未知的类型 {content}");
+                            LogUtil.AddIgnoreLog(tableFile, sheetName, $"未知的类型 {content},可能没有选择@typedefine表");
                             break;
                         }
                         if (DataType.IsEnum(elementType))
@@ -299,6 +334,46 @@ namespace ExcelToCode.Excel
                             {
                                 LogUtil.AddIgnoreLog(tableFile, sheetName, $"没有定义的枚举字段{elementType} {content}");
                             }
+                            break;
+                        }
+                        if (DataType.IsClass(elementType))
+                        {
+                            var classDef = DataType.GetClassType(elementType);
+                            var valueDic = new Dictionary<string, object>();
+                            var strs = content.Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var str in strs)
+                            {
+                                if (str.Contains(":"))
+                                {
+                                    var strs2 = str.Split(":", StringSplitOptions.RemoveEmptyEntries);
+                                    if (strs2.Length < 2)
+                                    {
+                                        LogUtil.AddIgnoreLog(tableFile, sheetName, $"解析自定义class失败 {elementType} {content},格式错误，不是filed:value格式");
+                                    }
+                                    else
+                                    {
+                                        if (classDef.FieldsMap.TryGetValue(strs2[0], out var field))
+                                        {
+                                            var key = strs2[0];
+                                            if (field.Elementtype == "textmult" && !field.IsArray)
+                                            {
+                                                key = "m_" + key;
+                                            }
+                                            valueDic[key] = GetTrueValue(tableFile, sheetName, strs2[1], field.Elementtype, field.IsArray, field.ArraySplitChar);
+                                        }
+                                        else
+                                        {
+                                            LogUtil.AddIgnoreLog(tableFile, sheetName, $"解析自定义class失败：{elementType} {content}不能发现字段{strs2[0]}");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    LogUtil.AddIgnoreLog(tableFile, sheetName, $"解析自定义class失败 {elementType} {content}");
+                                }
+                            }
+                            value = valueDic;
+                            break;
                         }
                         break;
                 }

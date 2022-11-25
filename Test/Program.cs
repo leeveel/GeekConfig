@@ -29,7 +29,9 @@ namespace Test
             {
                 Console.WriteLine(item.t_id + "-------" + item.t_array_param.Count + "-------" + item.t_int_param + "-------" + item.t_enum_Param);
                 foreach (var e in item.t_enumArray_Param)
-                    Console.WriteLine(item.t_id + "-------" + e);
+                    Console.WriteLine("t_enumArray_Param:" + item.t_id + "-------" + e);
+
+                Console.WriteLine("t_testclass_Param:" + item.t_id + "-------" + item.t_testclass_Param.z + "-------" + item.t_testclass_Param.lan + "-------" + item.t_testclass_Param.str);
             }
 
             var list = ConfigBean.GetBeanList<t_monsterBean>();

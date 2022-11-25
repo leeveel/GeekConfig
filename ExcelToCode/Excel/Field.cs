@@ -16,11 +16,12 @@ namespace ExcelToCode.Excel
         /// </summary>
         public string Name { set; get; }
 
+        public string Elementtype { set; get; }
+
         /// <summary>
         /// 数据类型(驼峰命名会被模板拆分为DataType==>Data_Type)
         /// (为保证模板和类属性一致，故用小写)
         /// </summary>
-        public string Elementtype { set; get; }
         public string Datatype
         {
             get
