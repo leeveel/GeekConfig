@@ -1,9 +1,45 @@
-﻿using Microsoft.VisualBasic.Devices;
+﻿using DotLiquid;
+using Microsoft.VisualBasic.Devices;
 using NLog.Fluent;
 using System.Text.RegularExpressions;
 
 namespace ExcelToCode.Excel
 {
+    public class EnumTypeField : Drop
+    {
+        public string Name { get; set; }
+        public int Value { get; set; }
+    }
+
+    public class EnumType : Drop
+    {
+        public EnumType()
+        {
+            AddField("NONE");
+        }
+        public string Name { get; set; }
+        public List<EnumTypeField> Fields { get; set; } = new();
+        public Dictionary<string, EnumTypeField> FieldsMap { get; set; } = new();
+
+        public void AddField(string name)
+        {
+            var field = new EnumTypeField { Name = name, Value = Fields.Count };
+            Fields.Add(field);
+            FieldsMap[name] = field;
+        }
+    }
+    public class ClassTypeField : Drop
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class ClassType : Drop
+    {
+        public string Name { get; set; }
+        public List<ClassTypeField> Fields { get; set; } = new();  //序列化的失火用字典，可以保留字段
+    }
+
     public static class DataType
     {
 
@@ -17,15 +53,62 @@ namespace ExcelToCode.Excel
 
         public const string TextMult = "textmult";
 
-        static Dictionary<string, string> columnBaseTypeMapper = new Dictionary<string, string>
+        public static Dictionary<string, string> selfDefineType = new();
+
+        static Dictionary<string, string> columnTypeMapper;
+
+        public static Dictionary<string, EnumType> selfEnumMapper;
+
+        public static Dictionary<string, ClassType> selfClassMapper;
+
+        public static void Init()
         {
-            {"","int" },//默认为int
-            {Int,"int" },
-            {Long,"long" },
-            {Float,"float" },
-            {Text,"string" },
-            {TextMult,TextMult },
-        };
+            columnTypeMapper = new Dictionary<string, string>
+            {
+                {"","int" },
+                {Int,"int" },
+                {Long,"long" },
+                {Float,"float" },
+                {Text,"string" },
+                {TextMult,TextMult },
+            };
+            selfEnumMapper = new();
+            selfClassMapper = new();
+        }
+
+        public static void AddEnum(EnumType t)
+        {
+            selfEnumMapper.Add(t.Name, t);
+            columnTypeMapper[t.Name] = t.Name;
+        }
+
+        public static void AddClass(ClassType t)
+        {
+            selfClassMapper.Add(t.Name, t);
+            columnTypeMapper[t.Name] = t.Name;
+        }
+
+        public static bool IsEnum(string type)
+        {
+            return selfEnumMapper.ContainsKey(type);
+        }
+
+        public static int GetEnumValue(string enumName, string fieldName)
+        {
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                return 0;
+            }
+            var fmap = selfEnumMapper[enumName].FieldsMap;
+            if (fmap.TryGetValue(fieldName, out var v))
+            {
+                return v.Value;
+            }
+            else
+            {
+                return -1;
+            }
+        }
 
         public static bool IsLegal(string type)
         {
@@ -34,7 +117,7 @@ namespace ExcelToCode.Excel
                 var t = type.Split("[]")[0];
                 return IsLegal(t);
             }
-            return columnBaseTypeMapper.ContainsKey(type);
+            return columnTypeMapper.ContainsKey(type);
         }
 
         //返回参数类型，是否是数组，数组分割符
@@ -52,7 +135,7 @@ namespace ExcelToCode.Excel
                 ret.Item3 = splitStr;
                 return ret;
             }
-            var trueType = columnBaseTypeMapper[type];
+            var trueType = columnTypeMapper[type];
             if (parentType == null)
             {
                 return (trueType, false, "");

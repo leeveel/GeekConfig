@@ -28,6 +28,9 @@
     <None Update="Configs\NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Configs\Template\Client\EnumDef.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Configs\Template\Client\SheetDeserializeProxy.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

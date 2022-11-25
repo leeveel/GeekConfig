@@ -5,6 +5,7 @@ using Data.Containers;
 using Base;
 using MessagePack;
 using System.Collections.Generic;
+using Data.SelfDefineType;
 
 namespace Data.Beans 
 {

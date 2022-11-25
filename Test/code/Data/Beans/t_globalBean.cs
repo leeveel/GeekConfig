@@ -5,6 +5,7 @@ using Data.Containers;
 using Base;
 using MessagePack;
 using System.Collections.Generic;
+using Data.SelfDefineType;
 
 namespace Data.Beans 
 {
@@ -24,6 +25,12 @@ namespace Data.Beans
 		///<summary>字符串</summary>
         [Key(3)]
         public List<int> t_array_param;
+		///<summary></summary>
+        [Key(4)]
+        public SkillTarget t_enum_Param;
+		///<summary></summary>
+        [Key(5)]
+        public List<SkillTarget> t_enumArray_Param;
 
     }
 }

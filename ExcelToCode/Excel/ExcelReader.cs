@@ -163,7 +163,7 @@ namespace ExcelToCode.Excel
                     {
                         if (headInfo.ValidFileds.ContainsKey(j))
                         {
-                            //string desc = Obj2String(sheet.GetValue(FieldDescRow, j));
+                            //string desc = Obj2String(sheet.GetTrueValue(FieldDescRow, j));
                             //if (desc == null)
                             //    desc = "";
                             //headInfo.AddFiledDesc(j, desc);
@@ -184,13 +184,41 @@ namespace ExcelToCode.Excel
             return res;
         }
 
-        public string Obj2String(object obj)
+        public static string Obj2String(object obj)
         {
             string str = "";
             if (obj != null)
                 str = obj.ToString();
             return str;
         }
+
+        public static Dictionary<string, List<List<string>>> ReadAllData(string filePath)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage package = new ExcelPackage(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            package.File = new FileInfo(filePath);
+
+            var datas = new Dictionary<string, List<List<string>>>();
+
+            foreach (var sheet in package.Workbook.Worksheets)
+            {
+                var sheetData = new List<List<string>>();
+                datas.Add(sheet.Name, sheetData);
+
+                for (int m = 1, n = sheet.Dimension.End.Row; m <= n; m++)
+                {
+                    var rowData = new List<string>();
+                    sheetData.Add(rowData);
+                    for (int j = 1; j <= sheet.Dimension.End.Column; j++)
+                    {
+                        rowData.Add(Obj2String(sheet.GetValue(m, j)));
+                    }
+                }
+            }
+            package.Dispose();
+            return datas;
+        }
+
 
         /// <summary>
         /// 获取导出类型

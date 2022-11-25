@@ -26,7 +26,11 @@ namespace Test
 
             var globalList = ConfigBean.GetBeanList<t_globalBean>();
             foreach (var item in globalList)
-                Console.WriteLine(item.t_id + "-------" + item.t_array_param.Count);
+            {
+                Console.WriteLine(item.t_id + "-------" + item.t_array_param.Count + "-------" + item.t_int_param + "-------" + item.t_enum_Param);
+                foreach (var e in item.t_enumArray_Param)
+                    Console.WriteLine(item.t_id + "-------" + e);
+            }
 
             var list = ConfigBean.GetBeanList<t_monsterBean>();
             foreach (var item in list)

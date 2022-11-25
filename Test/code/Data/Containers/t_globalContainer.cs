@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using Data.Beans;
 using MessagePack;
+using Data.SelfDefineType;
 
 namespace Data.Containers
 {

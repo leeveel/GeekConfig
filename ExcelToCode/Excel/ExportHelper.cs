@@ -28,9 +28,39 @@ namespace ExcelToCode.Excel
             IsInited = true;
         }
 
+        static void ParseSelfDefType(string filePath)
+        {
+            var tableDatas = ExcelReader.ReadAllData(filePath);
+            foreach (var sheetDatas in tableDatas)
+            {
+                if (sheetDatas.Key == "enumdef")
+                {
+                    foreach (var rowData in sheetDatas.Value)
+                    {
+                        if (rowData.Count == 0 || string.IsNullOrEmpty(rowData[0]))
+                        {
+                            continue;
+                        }
+                        var newEnum = new EnumType();
+                        newEnum.Name = rowData[0];
+                        for (int i = 1; i < rowData.Count; i++)
+                        {
+                            if (string.IsNullOrEmpty(rowData[i]))
+                                continue;
+                            newEnum.AddField(rowData[i].Trim());
+                        }
+                        DataType.AddEnum(newEnum);
+                    }
+                }
+            }
+        }
+
         public static void Export(ExportType etype, List<string> fileList, bool isAll)
         {
             Init();
+            DataType.Init();
+
+            var tempFileList = new List<string>(fileList.ToArray());
 
             //只有全部导出的时候才清空，导出单个文件不清空
             if (isAll)
@@ -50,8 +80,19 @@ namespace ExcelToCode.Excel
                     FileUtil.ClearDirectory(path);
             }
 
+            //判断是否有自定义类型表，有的话，先生成类型信息
+            var selfDefFile = tempFileList.Find(f => f.Contains("typedefine.xlsx"));
+            if (selfDefFile != null)
+            {
+                ParseSelfDefType(selfDefFile);
+                tempFileList.Remove(selfDefFile);
+            }
+
             DataMgrInfo mgrInfo = new DataMgrInfo();
-            for (int i = 0; i < fileList.Count; i++)
+            mgrInfo.Enumtypes = DataType.selfEnumMapper.Values.ToList();
+            mgrInfo.Classtypes = DataType.selfClassMapper.Values.ToList();
+
+            for (int i = 0; i < tempFileList.Count; i++)
             {
                 ExcelReader excelReader = new ExcelReader();
                 ExcelPackage package = null;
@@ -67,10 +108,24 @@ namespace ExcelToCode.Excel
                 if (package != null)
                     package.Dispose();
             }
+
+            GenSelfDef(etype, mgrInfo);
             GenDeserializeProxy(etype);
             GenGameDataManager(mgrInfo, etype, isAll);
             ExcelToCode.Program.MainForm.ToggleAllBtn(true);
             LogUtil.Add("---------导表完成-------------");
+        }
+
+        private static void GenSelfDef(ExportType etype, DataMgrInfo mgrInfo)
+        {
+            string targetPath = Setting.GetCodePath(etype) + @"/Data/Define/";
+            if (!Directory.Exists(targetPath))
+                Directory.CreateDirectory(targetPath);
+
+            string templatePath = Setting.GetTemplatePath(etype) + "/EnumDef.template";
+            Template template = Template.Parse(File.ReadAllText(templatePath));
+            var content = template.Render(Hash.FromAnonymousObject(mgrInfo));
+            File.WriteAllText(targetPath + "/DataEnum.cs", content);
         }
 
         private static void GenBeanAddContainer(List<SheetHeadInfo> headInfos, ExportType etype, DataMgrInfo mgrInfo)
@@ -187,7 +242,7 @@ namespace ExcelToCode.Excel
             File.WriteAllText(path, str);
         }
 
-        private static object GetValue(string content, string elementType, bool isArray, string splitChar)
+        private static object GetTrueValue(string tableFile, string sheetName, string content, string elementType, bool isArray, string splitChar)
         {
             if (isArray)
             {
@@ -197,7 +252,7 @@ namespace ExcelToCode.Excel
                 {
                     if (string.IsNullOrWhiteSpace(content))
                         continue;
-                    list.Add(GetValue(s, elementType, false, splitChar));
+                    list.Add(GetTrueValue(tableFile, sheetName, s, elementType, false, splitChar));
                 }
                 return list;
             }
@@ -231,6 +286,20 @@ namespace ExcelToCode.Excel
                         value = longVal;
                         break;
                     default:
+                        if (string.IsNullOrEmpty(elementType))
+                        {
+                            LogUtil.AddIgnoreLog(tableFile, sheetName, $"未知的类型 {content}");
+                            break;
+                        }
+                        if (DataType.IsEnum(elementType))
+                        {
+                            var v = DataType.GetEnumValue(elementType, content.Trim());
+                            value = v;
+                            if (v == -1)
+                            {
+                                LogUtil.AddIgnoreLog(tableFile, sheetName, $"没有定义的枚举字段{elementType} {content}");
+                            }
+                        }
                         break;
                 }
                 return value;
@@ -246,7 +315,7 @@ namespace ExcelToCode.Excel
             {
                 SheetHeadInfo headInfo = headInfos[i];
                 ExcelWorksheet sheet = package.Workbook.Worksheets[headInfo.SheetId]; //只导出合法表单id的数据 
-                //空表没有数据
+                                                                                      //空表没有数据
                 if (ExcelReader.DataStartRow > sheet.Dimension.End.Row)
                     continue;
 
@@ -294,7 +363,7 @@ namespace ExcelToCode.Excel
                             break;
                         }
 
-                        data.Add(GetValue(content, field.Elementtype, field.IsArray, field.ArraySplitChar));
+                        data.Add(GetTrueValue(package.File.Name, sheet.Name, content, field.Elementtype, field.IsArray, field.ArraySplitChar));
                     }
                     if (data != null)
                         datas.Add(data);

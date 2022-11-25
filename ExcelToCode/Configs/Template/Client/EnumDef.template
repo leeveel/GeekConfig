@@ -1,0 +1,21 @@
+/**
+ * Auto generated, do not edit it client
+ */
+using Base;
+using System;
+using Data.Beans;
+using Data.Containers;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Data.SelfDefineType
+{
+{%- for enumType in Enumtypes -%}
+	public enum {{enumType.Name}}
+	{ 
+        {%- for field in enumType.Fields -%}
+		{{field.Name}} = {{field.Value}},
+		{%- endfor -%}
+	}
+{%- endfor -%}
+}

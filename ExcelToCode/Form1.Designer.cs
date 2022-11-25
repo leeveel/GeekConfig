@@ -41,34 +41,46 @@
             // 
             // configListBox
             // 
+            this.configListBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.configListBox.FormattingEnabled = true;
-            this.configListBox.Location = new System.Drawing.Point(1, 0);
+            this.configListBox.Location = new System.Drawing.Point(2, 0);
+            this.configListBox.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.configListBox.Name = "configListBox";
-            this.configListBox.Size = new System.Drawing.Size(632, 310);
+            this.configListBox.Size = new System.Drawing.Size(991, 436);
             this.configListBox.TabIndex = 0;
             // 
             // logTb
             // 
-            this.logTb.Location = new System.Drawing.Point(1, 357);
+            this.logTb.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.logTb.Location = new System.Drawing.Point(2, 504);
+            this.logTb.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.logTb.Multiline = true;
             this.logTb.Name = "logTb";
-            this.logTb.Size = new System.Drawing.Size(243, 203);
+            this.logTb.Size = new System.Drawing.Size(381, 285);
             this.logTb.TabIndex = 1;
             // 
             // errLogTb
             // 
+            this.errLogTb.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.errLogTb.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.errLogTb.Location = new System.Drawing.Point(250, 357);
+            this.errLogTb.Location = new System.Drawing.Point(393, 504);
+            this.errLogTb.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.errLogTb.Multiline = true;
             this.errLogTb.Name = "errLogTb";
-            this.errLogTb.Size = new System.Drawing.Size(383, 203);
+            this.errLogTb.Size = new System.Drawing.Size(600, 285);
             this.errLogTb.TabIndex = 2;
             // 
             // ServerAll
             // 
-            this.ServerAll.Location = new System.Drawing.Point(18, 316);
+            this.ServerAll.Location = new System.Drawing.Point(28, 446);
+            this.ServerAll.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.ServerAll.Name = "ServerAll";
-            this.ServerAll.Size = new System.Drawing.Size(82, 32);
+            this.ServerAll.Size = new System.Drawing.Size(129, 45);
             this.ServerAll.TabIndex = 3;
             this.ServerAll.Text = "服务器-ALL";
             this.ServerAll.UseVisualStyleBackColor = true;
@@ -76,9 +88,10 @@
             // 
             // ServerSingle
             // 
-            this.ServerSingle.Location = new System.Drawing.Point(114, 316);
+            this.ServerSingle.Location = new System.Drawing.Point(179, 446);
+            this.ServerSingle.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.ServerSingle.Name = "ServerSingle";
-            this.ServerSingle.Size = new System.Drawing.Size(82, 32);
+            this.ServerSingle.Size = new System.Drawing.Size(129, 45);
             this.ServerSingle.TabIndex = 3;
             this.ServerSingle.Text = "服务器-单选";
             this.ServerSingle.UseVisualStyleBackColor = true;
@@ -86,9 +99,10 @@
             // 
             // clearLogBtn
             // 
-            this.clearLogBtn.Location = new System.Drawing.Point(210, 316);
+            this.clearLogBtn.Location = new System.Drawing.Point(330, 446);
+            this.clearLogBtn.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.clearLogBtn.Name = "clearLogBtn";
-            this.clearLogBtn.Size = new System.Drawing.Size(82, 32);
+            this.clearLogBtn.Size = new System.Drawing.Size(129, 45);
             this.clearLogBtn.TabIndex = 3;
             this.clearLogBtn.Text = "清理日志";
             this.clearLogBtn.UseVisualStyleBackColor = true;
@@ -96,9 +110,10 @@
             // 
             // ClientAll
             // 
-            this.ClientAll.Location = new System.Drawing.Point(327, 317);
+            this.ClientAll.Location = new System.Drawing.Point(514, 448);
+            this.ClientAll.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.ClientAll.Name = "ClientAll";
-            this.ClientAll.Size = new System.Drawing.Size(82, 32);
+            this.ClientAll.Size = new System.Drawing.Size(129, 45);
             this.ClientAll.TabIndex = 3;
             this.ClientAll.Text = "客户端-ALL";
             this.ClientAll.UseVisualStyleBackColor = true;
@@ -106,9 +121,10 @@
             // 
             // ClientSingle
             // 
-            this.ClientSingle.Location = new System.Drawing.Point(424, 317);
+            this.ClientSingle.Location = new System.Drawing.Point(666, 448);
+            this.ClientSingle.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.ClientSingle.Name = "ClientSingle";
-            this.ClientSingle.Size = new System.Drawing.Size(82, 32);
+            this.ClientSingle.Size = new System.Drawing.Size(129, 45);
             this.ClientSingle.TabIndex = 3;
             this.ClientSingle.Text = "客户端-单选";
             this.ClientSingle.UseVisualStyleBackColor = true;
@@ -116,9 +132,10 @@
             // 
             // clearErrLogBtn
             // 
-            this.clearErrLogBtn.Location = new System.Drawing.Point(521, 317);
+            this.clearErrLogBtn.Location = new System.Drawing.Point(819, 448);
+            this.clearErrLogBtn.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.clearErrLogBtn.Name = "clearErrLogBtn";
-            this.clearErrLogBtn.Size = new System.Drawing.Size(82, 32);
+            this.clearErrLogBtn.Size = new System.Drawing.Size(129, 45);
             this.clearErrLogBtn.TabIndex = 3;
             this.clearErrLogBtn.Text = "清理日志";
             this.clearErrLogBtn.UseVisualStyleBackColor = true;
@@ -126,9 +143,9 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(634, 561);
+            this.ClientSize = new System.Drawing.Size(996, 792);
             this.Controls.Add(this.clearErrLogBtn);
             this.Controls.Add(this.ClientSingle);
             this.Controls.Add(this.ClientAll);
@@ -138,6 +155,7 @@
             this.Controls.Add(this.errLogTb);
             this.Controls.Add(this.logTb);
             this.Controls.Add(this.configListBox);
+            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.Name = "Form1";
             this.Text = "导表工具";
             this.Load += new System.EventHandler(this.OnFormLoaded);
