@@ -15,6 +15,17 @@ using Data.SelfDefineType;
 
 namespace Data.Containers
 {
+    [MessagePackObject(false)]
+    public class t_globalBeanDeserializeProxy
+    {
+        [Key(0)]
+        public string sheetName;
+        [Key(1)]
+        public List<string> fieldNames = new List<string>();
+        [Key(2)]
+        public List<t_globalBean> datas = new List<t_globalBean>();
+    }
+
 	public class t_globalContainer : BaseContainer
 	{ 
 		private List<t_globalBean> list = new List<t_globalBean>();
@@ -45,7 +56,7 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<t_globalBean>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_globalBeanDeserializeProxy>(data);
                     list = proxy.datas;
                     foreach (var d in list)
                     {

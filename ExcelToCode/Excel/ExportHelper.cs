@@ -140,10 +140,26 @@ namespace ExcelToCode.Excel
             }
 
             GenSelfDef(etype, mgrInfo);
-            GenDeserializeProxy(etype);
             GenGameDataManager(mgrInfo, etype, isAll);
-            ExcelToCode.Program.MainForm.ToggleAllBtn(true);
-            LogUtil.Add("---------导表完成-------------");
+            GenMessagePackFormatters(mgrInfo, etype, isAll, () =>
+            {
+                ExcelToCode.Program.MainForm.ToggleAllBtn(true);
+                LogUtil.Add("---------导表完成-------------");
+            });
+
+        }
+
+        private static async void GenMessagePackFormatters(DataMgrInfo mgrInfo, ExportType etype, bool isAll, Action onCmp)
+        {
+            if (!isAll || etype == ExportType.Unknown || etype == ExportType.Server)
+            {
+                onCmp();
+                return;
+            }
+            string input = Setting.GetCodePath(etype) + @"/Data/";
+            string output = Setting.GetCodePath(etype) + @"/Data/Formatter";
+            await MessagePackFormattersGen.RunAsync(input, output);
+            onCmp();
         }
 
         private static void GenSelfDef(ExportType etype, DataMgrInfo mgrInfo)
@@ -268,14 +284,6 @@ namespace ExcelToCode.Excel
             }
         }
 
-        private static void GenDeserializeProxy(ExportType etype)
-        {
-            string path = Setting.GetCodePath(etype) + @"/Data/SheetDeserializeProxy.cs";
-            string templatePath = Setting.GetTemplatePath(etype) + "/SheetDeserializeProxy.template";
-            Template template = Template.Parse(File.ReadAllText(templatePath));
-            var str = template.Render();
-            File.WriteAllText(path, str);
-        }
 
         private static object GetTrueValue(string tableFile, string sheetName, string content, string elementType, bool isArray, string splitChar)
         {
@@ -384,7 +392,7 @@ namespace ExcelToCode.Excel
 
         private static void GenBin(List<SheetHeadInfo> headInfos, ExcelPackage package, ExportType etype)
         {
-            var msgPackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
+            //var msgPackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
 
             for (int i = 0; i < headInfos.Count; i++)
             {
@@ -454,13 +462,13 @@ namespace ExcelToCode.Excel
                         {
                             colDatas.Add(new List<object> { d[0], d[k] });
                         }
-                        var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy, msgPackOption);
+                        var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy);
                         System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + headInfo.Fields[k].Name.Replace("t_", "") + "Bean.bytes", dataBytes);
                     }
                 }
                 else
                 {
-                    var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy, msgPackOption);
+                    var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy);
                     System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.bytes", dataBytes);
                     //System.IO.File.WriteAllText(Setting.GetBinPath(etype) + headInfo.SheetName + "Bean.txt", MessagePack.MessagePackSerializer.SerializeToJson(proxy));
                 }

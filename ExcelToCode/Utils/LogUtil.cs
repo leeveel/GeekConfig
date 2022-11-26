@@ -42,8 +42,12 @@ public class LogUtil
         sb.Append(sheetName);
         sb.Append("]--");
         sb.Append(reason);
-        sb.Append("--被忽略");
         Add(sb.ToString(), true);
+    }
+
+    public static void AddErrLog(string err)
+    {
+        Add(err, true);
     }
 
     public static void AddNormalLog(string fileName, string msg)

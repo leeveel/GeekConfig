@@ -2,6 +2,8 @@
 using Data.Beans;
 using Data.Containers;
 using MessagePack;
+using MessagePack.Resolvers;
+using Resolvers;
 using System;
 using System.Collections.Generic;
 
@@ -14,6 +16,16 @@ namespace Test
             Console.WriteLine("-----------------start----------------");
 
             ConfigManager.Singleton.Language = "t_chinese";
+
+            StaticCompositeResolver.Instance.Register(
+              BuiltinResolver.Instance,
+              AttributeFormatterResolver.Instance,
+              PrimitiveObjectResolver.Instance,
+              StandardResolver.Instance,
+              ConfigDataResolver.Instance
+            );
+            var option = MessagePackSerializerOptions.Standard.WithResolver(StaticCompositeResolver.Instance);
+            MessagePackSerializer.DefaultOptions = option;
 
             //设置测试服务器/客户端
             ConfigManager.Singleton.IsServer = false;

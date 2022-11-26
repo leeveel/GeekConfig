@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelToCode", "ExcelToCode\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{F4C09DDC-B49F-40DF-813B-F2A7B6C192DC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePack.GeneratorCore", "MessagePack.GeneratorCore\MessagePack.GeneratorCore.csproj", "{F44234C2-4F16-4F81-A437-B0797EF9C904}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F4C09DDC-B49F-40DF-813B-F2A7B6C192DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4C09DDC-B49F-40DF-813B-F2A7B6C192DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4C09DDC-B49F-40DF-813B-F2A7B6C192DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F44234C2-4F16-4F81-A437-B0797EF9C904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F44234C2-4F16-4F81-A437-B0797EF9C904}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F44234C2-4F16-4F81-A437-B0797EF9C904}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F44234C2-4F16-4F81-A437-B0797EF9C904}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
