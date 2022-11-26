@@ -15,15 +15,45 @@ using Data.SelfDefineType;
 
 namespace Data.Containers
 {
-    [MessagePackObject(false)]
-    public class t_monsterBeanDeserializeProxy
+	[MessagePackObject(true)]
+    public class t_monsterBeanDeserializeProxyData
     {
-        [Key(0)]
-        public string sheetName;
-        [Key(1)]
-        public List<string> fieldNames = new List<string>();
-        [Key(2)]
-        public List<t_monsterBean> datas = new List<t_monsterBean>();
+
+        public List<int> t_id; 
+
+        public List<int> t_name; 
+
+        public List<int> t_monster_id; 
+
+        public List<int> t_monster_ui; 
+
+        public List<int> t_monster_type; 
+
+        public List<int> t_star; 
+
+        public List<int> t_lv; 
+
+        public List<int> t_head; 
+
+        public List<int> t_camp; 
+
+        public List<int> t_type; 
+
+        public List<int> t_battle_prefab; 
+
+        public List<int> t_scale; 
+
+        public List<string> t_skill; 
+
+        public List<int> t_att; 
+
+    }
+
+    [MessagePackObject(true)]
+    public class t_monsterBeanDeserializeProxy
+    { 
+        public string sheetName;   
+		public t_monsterBeanDeserializeProxyData datas;
     }
 
 	public class t_monsterContainer : BaseContainer
@@ -56,8 +86,88 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_monsterBeanDeserializeProxy>(data);
-                    list = proxy.datas;
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_monsterBeanDeserializeProxy>(data); 
+					var datas = proxy.datas;
+					var rowCount = datas.t_id.Count;
+					list = new List<t_monsterBean>(rowCount); 
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        var bean = new t_monsterBean();
+                        list.Add(bean);
+
+						if (datas.t_id != null && datas.t_id.Count > i)
+                        { 
+							bean.t_id = datas.t_id[i];
+                        }
+
+						if (datas.t_name != null && datas.t_name.Count > i)
+                        { 
+
+                            bean.m_t_name = datas.t_name[i];
+                        }
+
+						if (datas.t_monster_id != null && datas.t_monster_id.Count > i)
+                        { 
+							bean.t_monster_id = datas.t_monster_id[i];
+                        }
+
+						if (datas.t_monster_ui != null && datas.t_monster_ui.Count > i)
+                        { 
+							bean.t_monster_ui = datas.t_monster_ui[i];
+                        }
+
+						if (datas.t_monster_type != null && datas.t_monster_type.Count > i)
+                        { 
+							bean.t_monster_type = datas.t_monster_type[i];
+                        }
+
+						if (datas.t_star != null && datas.t_star.Count > i)
+                        { 
+							bean.t_star = datas.t_star[i];
+                        }
+
+						if (datas.t_lv != null && datas.t_lv.Count > i)
+                        { 
+							bean.t_lv = datas.t_lv[i];
+                        }
+
+						if (datas.t_head != null && datas.t_head.Count > i)
+                        { 
+							bean.t_head = datas.t_head[i];
+                        }
+
+						if (datas.t_camp != null && datas.t_camp.Count > i)
+                        { 
+							bean.t_camp = datas.t_camp[i];
+                        }
+
+						if (datas.t_type != null && datas.t_type.Count > i)
+                        { 
+							bean.t_type = datas.t_type[i];
+                        }
+
+						if (datas.t_battle_prefab != null && datas.t_battle_prefab.Count > i)
+                        { 
+							bean.t_battle_prefab = datas.t_battle_prefab[i];
+                        }
+
+						if (datas.t_scale != null && datas.t_scale.Count > i)
+                        { 
+							bean.t_scale = datas.t_scale[i];
+                        }
+
+						if (datas.t_skill != null && datas.t_skill.Count > i)
+                        { 
+							bean.t_skill = datas.t_skill[i];
+                        }
+
+						if (datas.t_att != null && datas.t_att.Count > i)
+                        { 
+							bean.t_att = datas.t_att[i];
+                        }
+
+                    }
+
                     foreach (var d in list)
                     {
                         if (!map.ContainsKey(d.t_id))

@@ -49,19 +49,19 @@ namespace Resolvers
         {
             lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(14)
             {
-                { typeof(global::System.Collections.Generic.List<global::Data.Beans.t_globalBean>), 0 },
-                { typeof(global::System.Collections.Generic.List<global::Data.Beans.t_languageBean>), 1 },
-                { typeof(global::System.Collections.Generic.List<global::Data.Beans.t_monsterBean>), 2 },
-                { typeof(global::System.Collections.Generic.List<global::Data.SelfDefineType.SkillTarget>), 3 },
+                { typeof(global::System.Collections.Generic.List<global::Data.SelfDefineType.SkillTarget>), 0 },
+                { typeof(global::System.Collections.Generic.List<global::Data.SelfDefineType.TestClass>), 1 },
+                { typeof(global::System.Collections.Generic.List<global::System.Collections.Generic.List<global::Data.SelfDefineType.SkillTarget>>), 2 },
+                { typeof(global::System.Collections.Generic.List<global::System.Collections.Generic.List<int>>), 3 },
                 { typeof(global::System.Collections.Generic.List<int>), 4 },
                 { typeof(global::System.Collections.Generic.List<string>), 5 },
                 { typeof(global::Data.SelfDefineType.SkillTarget), 6 },
-                { typeof(global::Data.Beans.t_globalBean), 7 },
-                { typeof(global::Data.Beans.t_languageBean), 8 },
-                { typeof(global::Data.Beans.t_monsterBean), 9 },
-                { typeof(global::Data.Containers.t_globalBeanDeserializeProxy), 10 },
-                { typeof(global::Data.Containers.t_languageBeanDeserializeProxy), 11 },
-                { typeof(global::Data.Containers.t_monsterBeanDeserializeProxy), 12 },
+                { typeof(global::Data.Containers.t_globalBeanDeserializeProxy), 7 },
+                { typeof(global::Data.Containers.t_globalBeanDeserializeProxyData), 8 },
+                { typeof(global::Data.Containers.t_languageBeanDeserializeProxy), 9 },
+                { typeof(global::Data.Containers.t_languageBeanDeserializeProxyData), 10 },
+                { typeof(global::Data.Containers.t_monsterBeanDeserializeProxy), 11 },
+                { typeof(global::Data.Containers.t_monsterBeanDeserializeProxyData), 12 },
                 { typeof(global::Data.SelfDefineType.TestClass), 13 },
             };
         }
@@ -76,19 +76,19 @@ namespace Resolvers
 
             switch (key)
             {
-                case 0: return new global::MessagePack.Formatters.ListFormatter<global::Data.Beans.t_globalBean>();
-                case 1: return new global::MessagePack.Formatters.ListFormatter<global::Data.Beans.t_languageBean>();
-                case 2: return new global::MessagePack.Formatters.ListFormatter<global::Data.Beans.t_monsterBean>();
-                case 3: return new global::MessagePack.Formatters.ListFormatter<global::Data.SelfDefineType.SkillTarget>();
+                case 0: return new global::MessagePack.Formatters.ListFormatter<global::Data.SelfDefineType.SkillTarget>();
+                case 1: return new global::MessagePack.Formatters.ListFormatter<global::Data.SelfDefineType.TestClass>();
+                case 2: return new global::MessagePack.Formatters.ListFormatter<global::System.Collections.Generic.List<global::Data.SelfDefineType.SkillTarget>>();
+                case 3: return new global::MessagePack.Formatters.ListFormatter<global::System.Collections.Generic.List<int>>();
                 case 4: return new global::MessagePack.Formatters.ListFormatter<int>();
                 case 5: return new global::MessagePack.Formatters.ListFormatter<string>();
                 case 6: return new Formatters.Data.SelfDefineType.SkillTargetFormatter();
-                case 7: return new Formatters.Data.Beans.t_globalBeanFormatter();
-                case 8: return new Formatters.Data.Beans.t_languageBeanFormatter();
-                case 9: return new Formatters.Data.Beans.t_monsterBeanFormatter();
-                case 10: return new Formatters.Data.Containers.t_globalBeanDeserializeProxyFormatter();
-                case 11: return new Formatters.Data.Containers.t_languageBeanDeserializeProxyFormatter();
-                case 12: return new Formatters.Data.Containers.t_monsterBeanDeserializeProxyFormatter();
+                case 7: return new Formatters.Data.Containers.t_globalBeanDeserializeProxyFormatter();
+                case 8: return new Formatters.Data.Containers.t_globalBeanDeserializeProxyDataFormatter();
+                case 9: return new Formatters.Data.Containers.t_languageBeanDeserializeProxyFormatter();
+                case 10: return new Formatters.Data.Containers.t_languageBeanDeserializeProxyDataFormatter();
+                case 11: return new Formatters.Data.Containers.t_monsterBeanDeserializeProxyFormatter();
+                case 12: return new Formatters.Data.Containers.t_monsterBeanDeserializeProxyDataFormatter();
                 case 13: return new Formatters.Data.SelfDefineType.TestClassFormatter();
                 default: return null;
             }

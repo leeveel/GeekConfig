@@ -29,6 +29,13 @@ namespace ExcelToCode.Excel
                 return IsArray ? $"List<{Elementtype}>" : Elementtype;
             }
         }
+        public string Serializetype
+        {
+            get
+            {
+                return Elementtype == "textmult" ? "int" : Datatype;
+            }
+        }
 
         /// <summary>
         /// 字段描述

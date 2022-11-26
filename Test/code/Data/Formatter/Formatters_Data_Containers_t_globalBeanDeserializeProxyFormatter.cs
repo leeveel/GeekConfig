@@ -18,20 +18,25 @@ namespace Formatters.Data.Containers
 {
     public sealed class t_globalBeanDeserializeProxyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Data.Containers.t_globalBeanDeserializeProxy>
     {
+        // sheetName
+        private static global::System.ReadOnlySpan<byte> GetSpan_sheetName() => new byte[1 + 9] { 169, 115, 104, 101, 101, 116, 78, 97, 109, 101 };
+        // datas
+        private static global::System.ReadOnlySpan<byte> GetSpan_datas() => new byte[1 + 5] { 165, 100, 97, 116, 97, 115 };
 
         public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Data.Containers.t_globalBeanDeserializeProxy value, global::MessagePack.MessagePackSerializerOptions options)
         {
-            if (value == null)
+            if (value is null)
             {
                 writer.WriteNil();
                 return;
             }
 
-            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(3);
+            var formatterResolver = options.Resolver;
+            writer.WriteMapHeader(2);
+            writer.WriteRaw(GetSpan_sheetName());
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.sheetName, options);
-            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<string>>(formatterResolver).Serialize(ref writer, value.fieldNames, options);
-            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<global::Data.Beans.t_globalBean>>(formatterResolver).Serialize(ref writer, value.datas, options);
+            writer.WriteRaw(GetSpan_datas());
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Data.Containers.t_globalBeanDeserializeProxyData>(formatterResolver).Serialize(ref writer, value.datas, options);
         }
 
         public global::Data.Containers.t_globalBeanDeserializeProxy Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
@@ -42,26 +47,30 @@ namespace Formatters.Data.Containers
             }
 
             options.Security.DepthStep(ref reader);
-            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            var length = reader.ReadArrayHeader();
+            var formatterResolver = options.Resolver;
+            var length = reader.ReadMapHeader();
             var ____result = new global::Data.Containers.t_globalBeanDeserializeProxy();
 
             for (int i = 0; i < length; i++)
             {
-                switch (i)
+                var stringKey = global::MessagePack.Internal.CodeGenHelpers.ReadStringSpan(ref reader);
+                switch (stringKey.Length)
                 {
-                    case 0:
-                        ____result.sheetName = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
-                        break;
-                    case 1:
-                        ____result.fieldNames = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<string>>(formatterResolver).Deserialize(ref reader, options);
-                        break;
-                    case 2:
-                        ____result.datas = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<global::Data.Beans.t_globalBean>>(formatterResolver).Deserialize(ref reader, options);
-                        break;
                     default:
-                        reader.Skip();
-                        break;
+                    FAIL:
+                      reader.Skip();
+                      continue;
+                    case 9:
+                        if (!global::System.MemoryExtensions.SequenceEqual(stringKey, GetSpan_sheetName().Slice(1))) { goto FAIL; }
+
+                        ____result.sheetName = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
+                        continue;
+                    case 5:
+                        if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 495556256100UL) { goto FAIL; }
+
+                        ____result.datas = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Data.Containers.t_globalBeanDeserializeProxyData>(formatterResolver).Deserialize(ref reader, options);
+                        continue;
+
                 }
             }
 

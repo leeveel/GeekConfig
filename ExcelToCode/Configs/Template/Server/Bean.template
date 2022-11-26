@@ -9,16 +9,13 @@ using Data.SelfDefineType;
 
 namespace Data.Beans 
 {
-	///<summary>{{SheetNameDesc}}</summary>
-    [MessagePackObject(false)]
+	///<summary>{{SheetNameDesc}}</summary> 
     public class {{BeanClassName}} : BaseBin
     {
         {%- for field in Fields -%}
-        {%- if field.Datatype == "textmult" -%} 
-        [Key({{field.Serializeid}})]
+        {%- if field.Datatype == "textmult" -%}  
         public int m_{{field.Name}};
-		///<summary>{{field.Desc}}</summary>
-		[IgnoreMember]
+		///<summary>{{field.Desc}}</summary> 
         public string {{field.name}}
 		{
 			get           
@@ -33,8 +30,7 @@ namespace Data.Beans
 			}
 		}
         {%- else -%}
-		///<summary>{{field.Desc}}</summary>
-        [Key({{field.Serializeid}})]
+		///<summary>{{field.Desc}}</summary> 
         public {{field.Datatype}} {{field.Name}};
 		{%- endif -%}
         {%- endfor -%} 

@@ -15,15 +15,19 @@ using Data.SelfDefineType;
 
 namespace Data.Containers
 {
-    [MessagePackObject(false)]
-    public class {{BeanClassName}}DeserializeProxy
+	[MessagePackObject(true)]
+    public class {{BeanClassName}}DeserializeProxyData
     {
-        [Key(0)]
-        public string sheetName;
-        [Key(1)]
-        public List<string> fieldNames = new List<string>();
-        [Key(2)]
-        public List<{{BeanClassName}}> datas = new List<{{BeanClassName}}>();
+		{%- for field in Fields -%}  
+        public List<{{field.Serializetype}}> {{field.Name}}; 
+        {%- endfor -%} 
+    }
+
+    [MessagePackObject(true)]
+    public class {{BeanClassName}}DeserializeProxy
+    { 
+        public string sheetName;   
+		public {{BeanClassName}}DeserializeProxyData datas;
     }
 
 	public class {{ContainerClassName}} : BaseContainer
@@ -56,8 +60,26 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<{{BeanClassName}}DeserializeProxy>(data);
-                    list = proxy.datas;
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<{{BeanClassName}}DeserializeProxy>(data); 
+					var datas = proxy.datas;
+					var rowCount = datas.t_id.Count;
+					list = new List<{{BeanClassName}}>(rowCount); 
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        var bean = new {{BeanClassName}}();
+                        list.Add(bean);
+						{%- for field in Fields -%}   
+						if (datas.{{field.Name}} != null && datas.{{field.Name}}.Count > i)
+                        { 
+							{%- if field.Datatype == "textmult" -%}  
+                            bean.m_{{field.Name}} = datas.{{field.Name}}[i];
+							{%- else -%}
+							bean.{{field.Name}} = datas.{{field.Name}}[i];
+							{%- endif -%}
+                        }
+						{%- endfor -%}  
+                    }
+
                     foreach (var d in list)
                     {
                         if (!map.ContainsKey(d.t_id))
