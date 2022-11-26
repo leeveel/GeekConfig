@@ -14,15 +14,20 @@ using MessagePack;
 
 namespace Data.Containers
 {   
-	[MessagePackObject(false)]
-    public class t_languageBeanDeserializeProxy
+
+	[MessagePackObject(true)]
+    public class t_languageBeanDeserializeProxyData
     {
-        [Key(0)]
-        public string sheetName;
-        [Key(1)]
-        public List<string> fieldNames = new List<string>();
-        [Key(2)]
-        public List<t_languageBean> datas = new List<t_languageBean>();
+        public List<int> t_id;  
+        public List<string> content;  
+    }
+
+    [MessagePackObject(true)]
+    public class t_languageBeanDeserializeProxy
+    { 
+        public string sheetName;  
+		public int rowCount; 
+		public t_languageBeanDeserializeProxyData datas;
     }
 
 	public class t_languageContainer : BaseContainer
@@ -56,8 +61,18 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_languageBeanDeserializeProxy>(data);
-                    list = proxy.datas;
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_languageBeanDeserializeProxy>(data); 
+					var datas = proxy.datas;
+					var rowCount = datas.t_id.Count;
+					list = new List<t_languageBean>(rowCount);  
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        var bean = new t_languageBean();
+                        list.Add(bean); 
+                        bean.t_id = datas.t_id[i];  
+                        bean.t_content = datas.content[i];  
+                    }
+
                     foreach (var d in list)
                     {
                         if (!map.ContainsKey(d.t_id))

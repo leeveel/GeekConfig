@@ -7,13 +7,10 @@ using Base;
 using MessagePack; 
 
 namespace Data.Beans
-{
-    [MessagePackObject(false)]
+{ 
     public class t_languageBean : BaseBin
-    { 
-        [Key(0)]
-		public int t_id;
-        [Key(1)]
+    {  
+		public int t_id; 
 		public string t_content;  
     }
 }

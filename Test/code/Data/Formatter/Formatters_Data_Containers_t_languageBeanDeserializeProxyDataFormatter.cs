@@ -16,14 +16,14 @@
 
 namespace Formatters.Data.Containers
 {
-    public sealed class t_monsterBeanDeserializeProxyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Data.Containers.t_monsterBeanDeserializeProxy>
+    public sealed class t_languageBeanDeserializeProxyDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Data.Containers.t_languageBeanDeserializeProxyData>
     {
-        // sheetName
-        private static global::System.ReadOnlySpan<byte> GetSpan_sheetName() => new byte[1 + 9] { 169, 115, 104, 101, 101, 116, 78, 97, 109, 101 };
-        // datas
-        private static global::System.ReadOnlySpan<byte> GetSpan_datas() => new byte[1 + 5] { 165, 100, 97, 116, 97, 115 };
+        // t_id
+        private static global::System.ReadOnlySpan<byte> GetSpan_t_id() => new byte[1 + 4] { 164, 116, 95, 105, 100 };
+        // content
+        private static global::System.ReadOnlySpan<byte> GetSpan_content() => new byte[1 + 7] { 167, 99, 111, 110, 116, 101, 110, 116 };
 
-        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Data.Containers.t_monsterBeanDeserializeProxy value, global::MessagePack.MessagePackSerializerOptions options)
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Data.Containers.t_languageBeanDeserializeProxyData value, global::MessagePack.MessagePackSerializerOptions options)
         {
             if (value is null)
             {
@@ -33,13 +33,13 @@ namespace Formatters.Data.Containers
 
             var formatterResolver = options.Resolver;
             writer.WriteMapHeader(2);
-            writer.WriteRaw(GetSpan_sheetName());
-            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.sheetName, options);
-            writer.WriteRaw(GetSpan_datas());
-            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Data.Containers.t_monsterBeanDeserializeProxyData>(formatterResolver).Serialize(ref writer, value.datas, options);
+            writer.WriteRaw(GetSpan_t_id());
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<int>>(formatterResolver).Serialize(ref writer, value.t_id, options);
+            writer.WriteRaw(GetSpan_content());
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<string>>(formatterResolver).Serialize(ref writer, value.content, options);
         }
 
-        public global::Data.Containers.t_monsterBeanDeserializeProxy Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        public global::Data.Containers.t_languageBeanDeserializeProxyData Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
@@ -49,7 +49,7 @@ namespace Formatters.Data.Containers
             options.Security.DepthStep(ref reader);
             var formatterResolver = options.Resolver;
             var length = reader.ReadMapHeader();
-            var ____result = new global::Data.Containers.t_monsterBeanDeserializeProxy();
+            var ____result = new global::Data.Containers.t_languageBeanDeserializeProxyData();
 
             for (int i = 0; i < length; i++)
             {
@@ -60,15 +60,15 @@ namespace Formatters.Data.Containers
                     FAIL:
                       reader.Skip();
                       continue;
-                    case 9:
-                        if (!global::System.MemoryExtensions.SequenceEqual(stringKey, GetSpan_sheetName().Slice(1))) { goto FAIL; }
+                    case 4:
+                        if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 1684627316UL) { goto FAIL; }
 
-                        ____result.sheetName = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
+                        ____result.t_id = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<int>>(formatterResolver).Deserialize(ref reader, options);
                         continue;
-                    case 5:
-                        if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 495556256100UL) { goto FAIL; }
+                    case 7:
+                        if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 32772479322582883UL) { goto FAIL; }
 
-                        ____result.datas = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Data.Containers.t_monsterBeanDeserializeProxyData>(formatterResolver).Deserialize(ref reader, options);
+                        ____result.content = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Collections.Generic.List<string>>(formatterResolver).Deserialize(ref reader, options);
                         continue;
 
                 }

@@ -9,30 +9,22 @@ using Data.SelfDefineType;
 
 namespace Data.Beans 
 {
-	///<summary>全局表</summary>
-    [MessagePackObject(false)]
+	///<summary>全局表</summary> 
     public class t_globalBean : BaseBin
     {
-		///<summary>Id</summary>
-        [Key(0)]
+		///<summary>Id</summary> 
         public int t_id;
-		///<summary>整形</summary>
-        [Key(1)]
+		///<summary>整形</summary> 
         public int t_int_param;
-		///<summary>字符串</summary>
-        [Key(2)]
+		///<summary>字符串</summary> 
         public string t_string_param;
-		///<summary>字符串</summary>
-        [Key(3)]
+		///<summary>字符串</summary> 
         public List<int> t_array_param;
-		///<summary></summary>
-        [Key(4)]
+		///<summary></summary> 
         public SkillTarget t_enum_Param;
-		///<summary></summary>
-        [Key(5)]
+		///<summary></summary> 
         public List<SkillTarget> t_enumArray_Param;
-		///<summary></summary>
-        [Key(6)]
+		///<summary></summary> 
         public TestClass t_testclass_Param;
 
     }

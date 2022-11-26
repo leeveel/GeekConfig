@@ -9,18 +9,14 @@ using Data.SelfDefineType;
 
 namespace Data.Beans 
 {
-	///<summary>怪物表</summary>
-    [MessagePackObject(false)]
+	///<summary>怪物表</summary> 
     public class t_monsterBean : BaseBin
     {
-		///<summary>Id</summary>
-        [Key(0)]
+		///<summary>Id</summary> 
         public int t_id;
 
-        [Key(1)]
         public int m_t_name;
-		///<summary>名字id</summary>
-		[IgnoreMember]
+		///<summary>名字id</summary> 
         public string t_name
 		{
 			get           
@@ -34,41 +30,29 @@ namespace Data.Beans
 					return m_t_name.ToString();
 			}
 		}
-		///<summary>对应角色id</summary>
-        [Key(2)]
+		///<summary>对应角色id</summary> 
         public int t_monster_id;
-		///<summary>战斗ui类型</summary>
-        [Key(3)]
+		///<summary>战斗ui类型</summary> 
         public int t_monster_ui;
-		///<summary>类型</summary>
-        [Key(4)]
+		///<summary>类型</summary> 
         public int t_monster_type;
-		///<summary>星级</summary>
-        [Key(5)]
+		///<summary>星级</summary> 
         public int t_star;
-		///<summary>等级</summary>
-        [Key(6)]
+		///<summary>等级</summary> 
         public int t_lv;
-		///<summary>头像id</summary>
-        [Key(7)]
+		///<summary>头像id</summary> 
         public int t_head;
-		///<summary>阵营</summary>
-        [Key(8)]
+		///<summary>阵营</summary> 
         public int t_camp;
-		///<summary>职业类型</summary>
-        [Key(9)]
+		///<summary>职业类型</summary> 
         public int t_type;
-		///<summary>预制件</summary>
-        [Key(10)]
+		///<summary>预制件</summary> 
         public int t_battle_prefab;
-		///<summary>预制件缩放</summary>
-        [Key(11)]
+		///<summary>预制件缩放</summary> 
         public int t_scale;
-		///<summary>技能id</summary>
-        [Key(12)]
+		///<summary>技能id</summary> 
         public string t_skill;
-		///<summary>属性加成</summary>
-        [Key(13)]
+		///<summary>属性加成</summary> 
         public int t_att;
 
     }

@@ -402,12 +402,9 @@ namespace ExcelToCode.Excel
                 if (ExcelReader.DataStartRow > sheet.Dimension.End.Row)
                     continue;
 
-                var proxy = new SheetDeserializeProxy<object>();
+                var proxy = new SheetSerializeProxy<object>();
                 proxy.sheetName = headInfos[i].SheetName;
                 var fieldNames = new List<string>();
-                var datas = new List<List<object>>(sheet.Dimension.End.Row - ExcelReader.DataStartRow);
-                proxy.fieldNames = fieldNames;
-                proxy.datas = datas;
 
                 bool splitColumn = headInfo.SheetName == "t_language";
 
@@ -424,45 +421,50 @@ namespace ExcelToCode.Excel
                     fieldNames.Add(content);
                 }
 
-                //写入数据
-                for (int m = ExcelReader.DataStartRow, n = sheet.Dimension.End.Row; m <= n; m++)
+                //按列保存数据
+                var emptyLine = new List<int>();
+                var rowCount = sheet.Dimension.End.Row;
+                for (int m = 0; m < fieldNames.Count; m++)
                 {
                     var data = new List<object>();
+                    proxy.datas[fieldNames[m]] = data;
 
-                    for (int j = 0; j < headInfos[i].Fields.Count; j++)
+                    Field field = headInfos[i].Fields[m];
+
+                    for (int n = ExcelReader.DataStartRow; n <= rowCount; n++)
                     {
-                        int col = headInfos[i].Fields[j].Col;
-                        Field field = headInfos[i].Fields[j];
-
                         var content = "";
-                        var obj = sheet.GetValue(m, col);
+                        var obj = sheet.GetValue(n, m + 1);
                         if (obj != null)
                             content = obj.ToString();
 
-                        //排除id为0的数据行
-                        if (j == 0 && string.IsNullOrEmpty(content))
+                        if (content == "" && field.Name == "t_id")
                         {
-                            data = null;
-                            break;
+                            emptyLine.Add(n - ExcelReader.DataStartRow);
                         }
 
                         data.Add(GetTrueValue(package.File.Name, sheet.Name, content, field.Elementtype, field.IsArray, field.ArraySplitChar));
                     }
-                    if (data != null)
-                        datas.Add(data);
                 }
+
+                for (int l = emptyLine.Count - 1; l >= 0; l--)
+                {
+                    foreach (var datas in proxy.datas)
+                    {
+                        datas.Value.RemoveAt(emptyLine[l]);
+                    }
+                }
+
 
                 if (splitColumn)
                 {
-                    for (int k = 1; k < headInfo.Fields.Count; k++)
+                    for (int k = 1; k < fieldNames.Count; k++)
                     {
-                        var colDatas = new List<List<object>>();
-                        proxy.datas = colDatas;
-                        foreach (var d in datas)
-                        {
-                            colDatas.Add(new List<object> { d[0], d[k] });
-                        }
-                        var dataBytes = MessagePack.MessagePackSerializer.Serialize(proxy);
+                        var splitProxy = new SheetSerializeProxy<object>();
+                        splitProxy.sheetName = proxy.sheetName;
+                        splitProxy.datas[fieldNames[0]] = proxy.datas[fieldNames[0]];
+                        splitProxy.datas["content"] = proxy.datas[fieldNames[k]];
+                        var dataBytes = MessagePack.MessagePackSerializer.Serialize(splitProxy);
                         System.IO.File.WriteAllBytes(Setting.GetBinPath(etype) + headInfo.SheetName + headInfo.Fields[k].Name.Replace("t_", "") + "Bean.bytes", dataBytes);
                     }
                 }

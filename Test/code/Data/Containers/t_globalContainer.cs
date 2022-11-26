@@ -15,15 +15,31 @@ using Data.SelfDefineType;
 
 namespace Data.Containers
 {
-    [MessagePackObject(false)]
-    public class t_globalBeanDeserializeProxy
+	[MessagePackObject(true)]
+    public class t_globalBeanDeserializeProxyData
     {
-        [Key(0)]
-        public string sheetName;
-        [Key(1)]
-        public List<string> fieldNames = new List<string>();
-        [Key(2)]
-        public List<t_globalBean> datas = new List<t_globalBean>();
+
+        public List<int> t_id; 
+
+        public List<int> t_int_param; 
+
+        public List<string> t_string_param; 
+
+        public List<List<int>> t_array_param; 
+
+        public List<SkillTarget> t_enum_Param; 
+
+        public List<List<SkillTarget>> t_enumArray_Param; 
+
+        public List<TestClass> t_testclass_Param; 
+
+    }
+
+    [MessagePackObject(true)]
+    public class t_globalBeanDeserializeProxy
+    { 
+        public string sheetName;   
+		public t_globalBeanDeserializeProxyData datas;
     }
 
 	public class t_globalContainer : BaseContainer
@@ -56,8 +72,52 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_globalBeanDeserializeProxy>(data);
-                    list = proxy.datas;
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_globalBeanDeserializeProxy>(data); 
+					var datas = proxy.datas;
+					var rowCount = datas.t_id.Count;
+					list = new List<t_globalBean>(rowCount); 
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        var bean = new t_globalBean();
+                        list.Add(bean);
+
+						if (datas.t_id != null && datas.t_id.Count > i)
+                        { 
+							bean.t_id = datas.t_id[i];
+                        }
+
+						if (datas.t_int_param != null && datas.t_int_param.Count > i)
+                        { 
+							bean.t_int_param = datas.t_int_param[i];
+                        }
+
+						if (datas.t_string_param != null && datas.t_string_param.Count > i)
+                        { 
+							bean.t_string_param = datas.t_string_param[i];
+                        }
+
+						if (datas.t_array_param != null && datas.t_array_param.Count > i)
+                        { 
+							bean.t_array_param = datas.t_array_param[i];
+                        }
+
+						if (datas.t_enum_Param != null && datas.t_enum_Param.Count > i)
+                        { 
+							bean.t_enum_Param = datas.t_enum_Param[i];
+                        }
+
+						if (datas.t_enumArray_Param != null && datas.t_enumArray_Param.Count > i)
+                        { 
+							bean.t_enumArray_Param = datas.t_enumArray_Param[i];
+                        }
+
+						if (datas.t_testclass_Param != null && datas.t_testclass_Param.Count > i)
+                        { 
+							bean.t_testclass_Param = datas.t_testclass_Param[i];
+                        }
+
+                    }
+
                     foreach (var d in list)
                     {
                         if (!map.ContainsKey(d.t_id))
