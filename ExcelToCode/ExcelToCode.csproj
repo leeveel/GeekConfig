@@ -19,6 +19,11 @@
     <PackageReference Include="DotLiquid" Version="2.2.656" />
     <PackageReference Include="EPPlus" Version="6.0.5" />
     <PackageReference Include="NLog" Version="5.0.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MessagePack.GeneratorCore\MessagePack.GeneratorCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,9 +37,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Configs\Template\Client\EnumDef.template">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Configs\Template\Client\SheetDeserializeProxy.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Configs\Template\Client\Bean.template">

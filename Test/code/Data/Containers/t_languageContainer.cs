@@ -13,7 +13,18 @@ using Data.Beans;
 using MessagePack;
 
 namespace Data.Containers
-{
+{   
+	[MessagePackObject(false)]
+    public class t_languageBeanDeserializeProxy
+    {
+        [Key(0)]
+        public string sheetName;
+        [Key(1)]
+        public List<string> fieldNames = new List<string>();
+        [Key(2)]
+        public List<t_languageBean> datas = new List<t_languageBean>();
+    }
+
 	public class t_languageContainer : BaseContainer
 	{
 		private List<t_languageBean> list = new List<t_languageBean>();
@@ -45,7 +56,7 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<t_languageBean>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_languageBeanDeserializeProxy>(data);
                     list = proxy.datas;
                     foreach (var d in list)
                     {

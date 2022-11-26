@@ -15,6 +15,17 @@ using Data.SelfDefineType;
 
 namespace Data.Containers
 {
+    [MessagePackObject(false)]
+    public class t_monsterBeanDeserializeProxy
+    {
+        [Key(0)]
+        public string sheetName;
+        [Key(1)]
+        public List<string> fieldNames = new List<string>();
+        [Key(2)]
+        public List<t_monsterBean> datas = new List<t_monsterBean>();
+    }
+
 	public class t_monsterContainer : BaseContainer
 	{ 
 		private List<t_monsterBean> list = new List<t_monsterBean>();
@@ -45,7 +56,7 @@ namespace Data.Containers
 			{
 				try
 				{
-					var proxy = MessagePack.MessagePackSerializer.Deserialize<SheetDeserializeProxy<t_monsterBean>>(data,MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray));
+					var proxy = MessagePack.MessagePackSerializer.Deserialize<t_monsterBeanDeserializeProxy>(data);
                     list = proxy.datas;
                     foreach (var d in list)
                     {
