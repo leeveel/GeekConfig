@@ -57,6 +57,9 @@
     <None Update="Configs\Template\Client\LanguageContainer.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Configs\Template\Server\ClassDef.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Configs\Template\Server\Container.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
