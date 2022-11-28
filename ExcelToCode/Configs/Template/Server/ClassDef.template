@@ -11,8 +11,8 @@ using MessagePack;
 
 namespace Data.SelfDefineType
 {
-	[MessagePackObject(true)]
 {%- for classType in Classtypes -%}
+	[MessagePackObject(true)]
 	public class {{classType.Name}}
 	{ 
        {%- for field in classType.Fields -%}
