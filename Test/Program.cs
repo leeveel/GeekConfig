@@ -3,7 +3,6 @@ using Data.Beans;
 using Data.Containers;
 using MessagePack;
 using MessagePack.Resolvers;
-using Resolvers;
 using System;
 using System.Collections.Generic;
 
@@ -21,8 +20,7 @@ namespace Test
               BuiltinResolver.Instance,
               AttributeFormatterResolver.Instance,
               PrimitiveObjectResolver.Instance,
-              StandardResolver.Instance,
-              ConfigDataResolver.Instance
+              StandardResolver.Instance
             );
             var option = MessagePackSerializerOptions.Standard.WithResolver(StaticCompositeResolver.Instance);
             MessagePackSerializer.DefaultOptions = option;
