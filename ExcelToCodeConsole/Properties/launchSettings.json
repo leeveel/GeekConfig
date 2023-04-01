@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExcelToCodeConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "../../excel/ test"
+    }
+  }
+}

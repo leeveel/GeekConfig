@@ -1,5 +1,6 @@
 ﻿using DotLiquid;
 using ExcelConverter.Utils;
+using ExcelToCodeCore.Utils;
 using MessagePack;
 using NLog;
 using OfficeOpenXml;
@@ -85,12 +86,12 @@ namespace ExcelToCode.Excel
             }
         }
 
-        public static void Export(ExportType etype, List<string> fileList, bool isAll)
+        public static async Task<bool> Export(ExportType etype, List<string> fileList, List<string> coverFileList, bool isAll)
         {
             Init();
             DataType.Init();
 
-            var tempFileList = new List<string>(fileList.ToArray());
+            fileList = new List<string>(fileList.ToArray());
 
             //只有全部导出的时候才清空，导出单个文件不清空
             if (isAll)
@@ -110,28 +111,73 @@ namespace ExcelToCode.Excel
                     FileUtil.ClearDirectory(path);
             }
 
+            LogUtil.Add("覆盖配置数量： " + (coverFileList != null ? coverFileList.Count : 0));
+            var coverMap = new Dictionary<string, string>();
+            if (coverFileList != null)
+            {
+                foreach (var file in coverFileList)
+                    coverMap[Path.GetFileName(file)] = file;
+            }
+
             //判断是否有自定义类型表，有的话，先生成类型信息
-            var selfDefFile = tempFileList.Find(f => f.Contains("typedefine.xlsx"));
+            var selfDefFile = fileList.Find(f => f.Contains("typedefine.xlsx"));
             if (selfDefFile != null)
             {
                 ParseSelfDefType(selfDefFile);
-                tempFileList.Remove(selfDefFile);
+                fileList.Remove(selfDefFile);
             }
 
             DataMgrInfo mgrInfo = new DataMgrInfo();
             mgrInfo.Enumtypes = DataType.selfEnumMapper.Values.ToList();
             mgrInfo.Classtypes = DataType.selfClassMapper.Values.ToList();
-
-            for (int i = 0; i < tempFileList.Count; i++)
+            var coverErr = "";
+            for (int i = 0; i < fileList.Count; i++)
             {
                 ExcelReader excelReader = new ExcelReader();
                 ExcelPackage package = null;
                 List<SheetHeadInfo> headInfos = excelReader.ReadHeadInfo(fileList[i], etype, out package);
 
-                GenBin(headInfos, package, etype);
-                //Task.Run(()=> { GenBin(headInfos, package, etype); });
-                GenBeanAddContainer(headInfos, etype, mgrInfo);
+                //覆盖数据
+                ExcelPackage coverPackage = null;
+                var fileName = Path.GetFileName(fileList[i]);
+                if (coverMap.ContainsKey(fileName))
+                {
+                    var coverHeadInfos = new ExcelReader().ReadHeadInfo(coverMap[fileName], etype, out coverPackage);
+                    //检测2张表的字段个数和顺序是否一致
+                    for (int x = 0; x < headInfos.Count || x < coverHeadInfos.Count; ++x)
+                    {
+                        if (coverHeadInfos.Count <= x)
+                            coverErr = "差异表少了一个sheet:" + headInfos[x].SheetName;
+                        if (headInfos.Count <= x)
+                            coverErr = "差异表多了一个sheet:" + coverHeadInfos[x].SheetName;
+                        if (headInfos[x].SheetName != coverHeadInfos[x].SheetName)
+                            coverErr = $"原表和差异表第【{x}】个sheet 名字不相同【{headInfos[x].SheetName}】 【{coverHeadInfos[x].SheetName}】";
+                        for (int y = 0; y < headInfos[x].FieldCount || y < coverHeadInfos[x].FieldCount; ++y)
+                        {
+                            if (coverHeadInfos[x].FieldCount <= y)
+                                coverErr = $"差异表【{headInfos[x].SheetName}】少了一个字段:【{headInfos[x].Fields[y].Name}】";
+                            if (headInfos[x].FieldCount <= y)
+                                coverErr = $"差异表【{coverHeadInfos[x].SheetName}】多了一个字段:【{coverHeadInfos[x].Fields[y].Name}】";
+                            if (headInfos[x].Fields[y].Name != coverHeadInfos[x].Fields[y].Name)
+                                coverErr = $"原表和差异表【{headInfos[x].SheetName}】sheet第【{y}】个字段名字不相同【{headInfos[x].Fields[y].Name}】【{coverHeadInfos[x].Fields[y].Name}】";
+                            if (headInfos[x].Fields[y].Datatype != coverHeadInfos[x].Fields[y].Datatype)
+                                coverErr = $"原表和差异表【{headInfos[x].SheetName}】sheet第【{y}】个字段【{headInfos[x].Fields[y].Name}】 类型不相同【{headInfos[x].Fields[y].Datatype}】【{coverHeadInfos[x].Fields[y].Datatype}】";
+                            if (!string.IsNullOrEmpty(coverErr))
+                            {
+                                LogUtil.Add(coverErr, true);
+                                return false;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(coverErr))
+                        {
+                            LogUtil.Add(coverErr, true);
+                            return false;
+                        }
+                    }
+                }
 
+                GenBin(headInfos, package, coverPackage, etype);
+                GenBeanAddContainer(headInfos, etype, mgrInfo);
 
                 LogUtil.AddNormalLog(package.File.Name, "导表完成");
 
@@ -141,25 +187,19 @@ namespace ExcelToCode.Excel
 
             GenSelfDef(etype, mgrInfo);
             GenGameDataManager(mgrInfo, etype, isAll);
-            GenMessagePackFormatters(mgrInfo, etype, isAll, () =>
-            {
-                ExcelToCode.Program.MainForm.ToggleAllBtn(true);
-                LogUtil.Add("---------导表完成-------------");
-            });
-
+            await GenMessagePackFormatters(mgrInfo, etype, isAll);
+            return true;
         }
 
-        private static async void GenMessagePackFormatters(DataMgrInfo mgrInfo, ExportType etype, bool isAll, Action onCmp)
+        private static async Task GenMessagePackFormatters(DataMgrInfo mgrInfo, ExportType etype, bool isAll)
         {
             if (!isAll || etype == ExportType.Unknown || etype == ExportType.Server)
             {
-                onCmp();
                 return;
             }
             string input = Setting.GetCodePath(etype) + @"/Data/";
             string output = Setting.GetCodePath(etype) + @"/Data/Formatter";
             await MessagePackFormattersGen.RunAsync(input, output);
-            onCmp();
         }
 
         private static void GenSelfDef(ExportType etype, DataMgrInfo mgrInfo)
@@ -390,7 +430,7 @@ namespace ExcelToCode.Excel
         }
 
 
-        private static void GenBin(List<SheetHeadInfo> headInfos, ExcelPackage package, ExportType etype)
+        private static void GenBin(List<SheetHeadInfo> headInfos, ExcelPackage package, ExcelPackage coverPackage, ExportType etype)
         {
             //var msgPackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
 
@@ -421,6 +461,36 @@ namespace ExcelToCode.Excel
                     fieldNames.Add(content);
                 }
 
+                //读取cover数据
+                ExcelWorksheet coverSheet = null;
+                if (coverPackage != null)
+                {
+                    foreach (var tempSheet in coverPackage.Workbook.Worksheets)
+                    {
+                        if (tempSheet.Name == sheet.Name)
+                        {
+                            coverSheet = tempSheet;
+                            break;
+                        }
+                    }
+                }
+                var coverDataMap = new Dictionary<string, int>();//key-line
+                if (coverSheet != null)
+                {
+                    for (int m = ExcelReader.DataStartRow, n = coverSheet.Dimension.End.Row; m <= n; m++)
+                    {
+                        var content = "";
+                        int col = headInfos[i].Fields[0].Col;
+                        var obj = coverSheet.GetValue(m, col);
+                        if (obj != null)
+                            content = obj.ToString();
+                        if (string.IsNullOrEmpty(content))
+                            continue;
+                        coverDataMap[content] = m;
+                    }
+                    LogUtil.Add($"{sheet.Name} 覆盖数据：{coverDataMap.Count}条");
+                }
+
                 //按列保存数据
                 var emptyLine = new List<int>();
                 var rowCount = sheet.Dimension.End.Row;
@@ -438,10 +508,24 @@ namespace ExcelToCode.Excel
                         if (obj != null)
                             content = obj.ToString();
 
+                        //覆盖数据
+                        if (m != 0)
+                        {
+                            var idStr = sheet.GetValue(n, 1)?.ToString();
+                            if (idStr != null && coverDataMap.ContainsKey(idStr))
+                            {
+                                content = "";
+                                obj = coverSheet.GetValue(coverDataMap[idStr], m + 1);
+                                if (obj != null)
+                                    content = obj.ToString();
+                            }
+                        }
+
                         if (content == "" && field.Name == "t_id")
                         {
                             emptyLine.Add(n - ExcelReader.DataStartRow);
                         }
+
 
                         data.Add(GetTrueValue(package.File.Name, sheet.Name, content, field.Elementtype, field.IsArray, field.ArraySplitChar));
                     }

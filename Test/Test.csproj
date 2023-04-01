@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.4.59" />
+    <PackageReference Include="MessagePack" Version="2.5.108" />
     <PackageReference Include="NLog" Version="4.7.5" />
   </ItemGroup>
 

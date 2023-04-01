@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using MessagePack;
 
 namespace Data.SelfDefineType
-{
+{ 
 	[MessagePackObject(true)]
 	public class TestClass
 	{ 

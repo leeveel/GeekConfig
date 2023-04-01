@@ -11,40 +11,32 @@ namespace ExcelToCode
         private static readonly NLog.Logger LOGGER = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// 普通表缓冲区大小-512KB
-        /// </summary>
-        public static int NormalBufferSize = 512 * 1024;
-
-        /// <summary>
-        /// 语言包缓冲区大小-5M
-        /// </summary>
-        public static int LanguageBufferSize = 5 * 1024 * 1024;
-
-        /// <summary>
         /// 配置表路径
         /// </summary>
-        public static string ConfigPath { private set; get; }
-
-
+        public static string ConfigPath { set; get; }
+        /// <summary>
+        /// 差异配置表路径
+        /// </summary>
+        public static string CoverConfigPath { get; set; }
         /// <summary>
         /// 客户端Bin路径
         /// </summary>
-        public static string ClientBinPath { private set; get; }
+        public static string ClientBinPath { set; get; }
 
         /// <summary>
         /// 服务器二进制路径
         /// </summary>
-        public static string ServerBinPath { private set; get; }
+        public static string ServerBinPath { set; get; }
 
         /// <summary>
         /// 客户端代码路径
         /// </summary>
-        public static string ClientCodePath { private set; get; }
+        public static string ClientCodePath { set; get; }
 
         /// <summary>
         /// 服务器代码路径
         /// </summary>
-        public static string ServerCodePath { private set; get; }
+        public static string ServerCodePath { set; get; }
 
         public static bool Init()
         {
@@ -61,12 +53,6 @@ namespace ExcelToCode
                 {
                     switch (node.Name)
                     {
-                        case "normal-buffer-size":
-                            NormalBufferSize = int.Parse(node.InnerText);
-                            break;
-                        case "lan-buffer-size":
-                            LanguageBufferSize = int.Parse(node.InnerText);
-                            break;
                         case "config-path":
                             ConfigPath = node.InnerText;
                             break;

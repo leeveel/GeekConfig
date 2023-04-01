@@ -5,6 +5,7 @@ using System.IO;
 using NLog;
 using ExcelConverter.Utils;
 using System.Drawing;
+using ExcelToCodeCore.Utils;
 
 namespace ExcelToCode.Excel
 {

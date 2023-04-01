@@ -14,7 +14,7 @@ namespace Data.Beans
     {
 		///<summary>Id</summary> 
         public int t_id;
-		///<summary>整形</summary> 
+		///<summary></summary> 
         public int t_int_param;
 		///<summary>字符串</summary> 
         public string t_string_param;

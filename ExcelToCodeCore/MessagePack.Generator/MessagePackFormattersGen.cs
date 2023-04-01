@@ -1,4 +1,5 @@
 ﻿
+using ExcelToCodeCore.Utils;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace ExcelToCode.Excel
                 }
                 else
                 {
-                    LogUtil.AddErrLog($"MessagePackFormattersGen无效的输入目录:{input}");
+                    LogUtil.Add($"MessagePackFormattersGen无效的输入目录:{input}", true);
                     return;
                 }
 
