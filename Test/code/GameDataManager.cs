@@ -13,23 +13,17 @@ namespace Data.Containers
 	public class GameDataManager
 	{
 		public static readonly GameDataManager Instance = new GameDataManager();
-        public t_languageContainer t_languageContainer = new t_languageContainer();
         public t_globalContainer t_globalContainer = new t_globalContainer();
-        public t_monsterContainer t_monsterContainer = new t_monsterContainer();
 		//@%@%@
 		private GameDataManager()
 		{
-			t_containerMap.Add(t_languageContainer.BinType, t_languageContainer);
 			t_containerMap.Add(t_globalContainer.BinType, t_globalContainer);
-			t_containerMap.Add(t_monsterContainer.BinType, t_monsterContainer);
 			//@#@#@
 		}
 		
 		public void LoadAll(bool forceReload = false)
 		{
-			LoadOneBean(t_languageContainer.BinType, forceReload);
 			LoadOneBean(t_globalContainer.BinType, forceReload);
-			LoadOneBean(t_monsterContainer.BinType, forceReload);
 			//@*@*@
 		}
 		

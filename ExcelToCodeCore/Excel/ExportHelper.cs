@@ -282,7 +282,7 @@ namespace ExcelToCode.Excel
                     return;
                 string containerName = mgrInfo.Containers[0];
 
-                string part1 = string.Format("public {0} {1} = new {2}();", containerName, containerName, containerName);
+                string part1 = string.Format("{0} {1} = new {2}();", containerName, containerName, containerName);
                 string part2 = string.Format("t_containerMap.Add({0}.BinType, {1});", containerName, containerName);
                 string part3 = string.Format("LoadOneBean({0}.BinType, forceReload);", containerName);
 
