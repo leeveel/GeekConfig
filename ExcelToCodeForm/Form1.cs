@@ -156,8 +156,11 @@ namespace ExcelToCode
             }
             if (selectList == null || selectList.Count > 1)
             {
-                MessageBox.Show("仅支持单选");
-                return;
+                if (!(selectList.Count == 2 && selectList.Find(f => f.Contains("typedefine.xlsx")) != null))
+                {
+                    MessageBox.Show("仅支持单选");
+                    return;
+                }
             }
             ToggleAllBtn(false);
             await ExportHelper.Export(etype, selectList, GetCoverFileList(), false);
